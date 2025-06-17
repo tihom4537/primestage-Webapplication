@@ -15,6 +15,7 @@ const categoryRoutes = require('./routes/categories').default || require('./rout
 const artistRoutes = require('./routes/artist');
 const Auth = require('./routes/otpVerification');
 const login = require('./routes/login');
+const signup = require('./routes/signup');
 const qrCodeRoutes = require('./controllers/QRCode');
 const equipmentRoutes = require('./routes/Equipments');
 const notificationRoutes = require('./controllers/notificationController');
@@ -54,14 +55,15 @@ app.use(cors({
 
  app.use('/api', categoryRoutes);
  app.use('/api/login', login);
+ app.use('/api/signup', signup);
  app.use('/api/search', artistRoutes);
  app.use('/api/auth', Auth);
  app.use('/api/payments', qrCodeRoutes);
  app.use('/api/kits', equipmentRoutes);
  app.use('/api/notifications', notificationRoutes);
-app.use('/api/booking', bookingProcess);
-app.use('/api/payments', require('./routes/payment'));
-app.use('/api/allbookings', allbooking);
+ app.use('/api/booking', bookingProcess);
+ app.use('/api/payments', require('./routes/payment'));
+ app.use('/api/allbookings', allbooking);
 
 
 // Default Route

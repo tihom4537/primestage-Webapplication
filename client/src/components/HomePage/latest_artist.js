@@ -19,7 +19,7 @@ const LatestArtists = () => {
       try {
         const lat = 30.75;
         const lng = 76.78;
-        const response = await fetch(`http://localhost:8000/api/search/featured?lat=${lat}&lng=${lng}`);
+        const response = await fetch(`/api/search/featured?lat=${lat}&lng=${lng}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch artists');
@@ -141,7 +141,7 @@ const LatestArtists = () => {
                   
                   <div className="flex justify-between items-center gap-2">
                     <p className="text-xs sm:text-sm md:text-base text-primary font-medium flex-shrink-0">
-                      Price: {artist.price_per_hour}/hr
+                      Event-Price: {artist.price_per_hour}
                     </p>
                     {artist.average_rating && (
                       <div className="flex items-center bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1 rounded-full text-xs sm:text-sm flex-shrink-0">

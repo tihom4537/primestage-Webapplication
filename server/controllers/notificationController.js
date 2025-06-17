@@ -19,7 +19,7 @@ async function getAccessToken() {
   try {
     // Create auth client with the proper credentials
     const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(__dirname, './homestage-51e95-firebase-adminsdk-x8i89-06c69d334b.json'),
+      keyFile: path.join(__dirname, './primestage-android-4f46e-firebase-adminsdk-fbsvc-4ef6939e17.json'),
       scopes: ['https://www.googleapis.com/auth/firebase.messaging']
     });
 
@@ -86,7 +86,7 @@ router.post('/send-notification-artist', async (req, res) => {
     
     // Send notification via Firebase Cloud Messaging
     const response = await axios.post(
-      'https://fcm.googleapis.com/v1/projects/homestage-51e95/messages:send',
+      'https://fcm.googleapis.com/v1/projects/primestage-android-4f46e/messages:send',
       messagePayload,
       {
         headers: {
@@ -161,7 +161,7 @@ router.post('/send-notification-user', async (req, res) => {
     
     // Send notification via Firebase Cloud Messaging
     const response = await axios.post(
-      'https://fcm.googleapis.com/v1/projects/homestage-51e95/messages:send',
+      'https://fcm.googleapis.com/v1/projects/primestage-android-4f46e/messages:send',
       messagePayload,
       {
         headers: {

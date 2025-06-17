@@ -12,7 +12,7 @@ const Footer = () => {
             <h4 className="font-medium mb-4 text-xl">HELP</h4>
             <ul className="space-y-2">
               <li><a href="./contact-us" className="hover:underline text-lg">Contact Us</a></li>
-              <li><a href="#" className="hover:underline text-lg">FAQs</a></li>
+              <li><a href="./FAQ" className="hover:underline text-lg">FAQs</a></li>
               <li><a href="./term-conditions" className="hover:underline text-lg">Terms & Conditions</a></li>
               <li><a href="./company-policies" className="hover:underline text-lg">Privacy Policy</a></li>
               <li><a href="./refund-policy" className="hover:underline text-lg">Cancellation and Refund</a></li>

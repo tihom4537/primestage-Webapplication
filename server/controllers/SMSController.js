@@ -121,18 +121,21 @@ class SMSController {
                     errors: errors.array()
                 });
             }
-
+             console.log("mohit");
             const { numbers: phone, otp: submittedOtp } = req.body;
             const storedOtp = this.getOTP(phone);
+            console.log(storedOtp );
 
             if (storedOtp && storedOtp === submittedOtp) {
                 // Remove the OTP after successful verification
                 this.otpStore.delete(phone);
+                console.log("success");
                 return res.status(200).json({
                     message: 'OTP verified successfully',
                     phone
                 });
             } else {
+                console.log("failure");
                 return res.status(400).json({
                     message: 'Invalid or expired OTP'
                 });

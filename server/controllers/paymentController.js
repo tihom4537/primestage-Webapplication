@@ -80,9 +80,8 @@ exports.verifyPayment = async (req, res) => {
     // Verify signature
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
 
-    console.log(sign);
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'QXJiLk56a1KPl8HBOxAuKDB8')
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'qpins0d1lLghfAc5m0TOs1NS')
       .update(sign)
       .digest('hex');
 

@@ -5,6 +5,13 @@ import PhoneAuthModal from './PhoneAuthModel';
 import { useAuth } from '../context/AuthContext';
 import Footer from './HomePage/footer';
 import Header from './HomePage/Header';
+// import PhoneAuthModal from './PhoneAuthModal';
+import SignUpModal from './SignUpModal';
+import StaticHeader from './HomePage/staticHeader';
+
+
+
+
 
 const ArtistShowcase = () => {
   const [activeTab, setActiveTab] = useState('gallery');
@@ -12,7 +19,7 @@ const ArtistShowcase = () => {
   const locationData = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  // const [showAuthModal, setShowAuthModal] = useState(false);
   const [artist, setArtist] = useState(locationData.state?.artist || null);
   const [isArtistLoading, setIsArtistLoading] = useState(false);
   const [artistError, setArtistError] = useState(null);
@@ -23,6 +30,8 @@ const ArtistShowcase = () => {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+ const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
 
   // Sample rating data (replace with actual data)
   const ratingData = {
@@ -83,7 +92,7 @@ const ArtistShowcase = () => {
   const fetchArtistDetails = async (artistId) => {
     setIsArtistLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/search/artists/${artistId}`);
+      const response = await fetch(`/api/search/artists/${artistId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch artist details');
@@ -103,7 +112,7 @@ const ArtistShowcase = () => {
   const fetchTeamDetails = async (teamId) => {
     setIsArtistLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/search/team/${teamId}`);
+      const response = await fetch(`/api/search/team/${teamId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch team member details');
@@ -130,8 +139,25 @@ const ArtistShowcase = () => {
       });
     } else {
       // If user is not logged in, show the auth modal
-      setShowAuthModal(true);
+      setShowLoginModal(true);
     }
+  };
+
+
+  const handleCloseLoginModal = () => {
+    setShowLoginModal(false);
+  };
+
+  const handleCloseSignUpModal = () => {
+    setShowSignUpModal(false);
+  };
+
+  const handleOpenSignUp = () => {
+    setShowSignUpModal(true);
+  };
+
+  const handleOpenLogin = () => {
+    setShowLoginModal(true);
   };
 
   // Video modal handlers
@@ -353,7 +379,7 @@ const extractYoutubeId = (url) => {
 
   return (
     <div className="bg-white min-h-screen">
-      <Header scrollProgress={scrollProgress} />
+      <StaticHeader/>
 
       {/* Hero Section */}
 <div className="max-w-7xl mx-auto px-4 py-6 pt-16">
@@ -473,10 +499,27 @@ const extractYoutubeId = (url) => {
           </button>
         </div>
 
-        {/* Phone Authentication Modal */}
-        {showAuthModal && (
+       // Phone Authentication Modal
+        {/* {showAuthModal && (
           <PhoneAuthModal artist={artist} onClose={() => setShowAuthModal(false)} />
-        )}
+        )} */}
+      {showLoginModal && (
+        <PhoneAuthModal
+          artist={artist}
+          onClose={handleCloseLoginModal}
+          onOpenSignUp={handleOpenSignUp}
+        />
+      )}
+
+
+        {/* Sign Up Modal */}
+       {showSignUpModal && (
+        <SignUpModal
+          artist={artist}
+          onClose={handleCloseSignUpModal}
+          onOpenLogin={handleOpenLogin}
+        />
+       )}
       </div>
     </div>
   </div>
@@ -693,10 +736,27 @@ const extractYoutubeId = (url) => {
         </button>
       </div>
 
-      {/* Phone Authentication Modal */}
+      {/* Phone Authentication Modal
       {showAuthModal && (
         <PhoneAuthModal artist={artist} onClose={() => setShowAuthModal(false)} />
+      )} */}
+
+      {showLoginModal && (
+        <PhoneAuthModal
+          artist={artist}
+          onClose={handleCloseLoginModal}
+          onOpenSignUp={handleOpenSignUp}
+        />
       )}
+       {/* Sign Up Modal */}
+       {showSignUpModal && (
+        <SignUpModal
+          artist={artist}
+          onClose={handleCloseSignUpModal}
+          onOpenLogin={handleOpenLogin}
+        />
+       )}
+
       {/* FAQs Section */}
       <div className="py-12 max-w-7xl mx-auto px-4">
         <h2 className="text-2xl font-bold mb-4">FAQs</h2>

@@ -4,9 +4,9 @@ import { Phone, X } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { AuthContext } from '../context/AuthContext'; // You'll need to create this
+import { AuthContext } from '../context/AuthContext';
 
-const PhoneAuthModal = ({ artist, onClose }) => {
+const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
   const [step, setStep] = useState('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -16,9 +16,8 @@ const PhoneAuthModal = ({ artist, onClose }) => {
   const { login } = useContext(AuthContext);
   const { user } = useAuth();
 
-
-   // Add effect to close modal and redirect if user is already logged in
-   useEffect(() => {
+  // Add effect to close modal and redirect if user is already logged in
+  useEffect(() => {
     if (user) {
       onClose();
       navigate('/artists/booking', {
@@ -31,7 +30,7 @@ const PhoneAuthModal = ({ artist, onClose }) => {
   }, [user, navigate, artist, onClose]);
 
   // API configuration
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
   const validatePhone = (phone) => {
     return phone.length === 10 && /^\d+$/.test(phone);
@@ -65,8 +64,7 @@ const PhoneAuthModal = ({ artist, onClose }) => {
     }
   };
 
-  // In your frontend PhoneAuthModal.js
-const handleOtpSubmit = async (e) => {
+  const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -87,15 +85,14 @@ const handleOtpSubmit = async (e) => {
         try {
           // Make sure the property names match what the backend expects
           const userResponse = await axios.post(`${API_BASE_URL}/login/user`, {
-            phone_number: phoneNumber,  // Make sure this matches the backend expected property name
-            fcm_token: 'your-fcm-token' // Add your FCM token here
+            phone_number: phoneNumber,
+            fcm_token: 'mohit here'
           });
           
           if (userResponse.data.message === 'loggedin and FCM token updated successfully.') {
             const userData = userResponse.data.user;
             const authToken = userResponse.data.token;
             login(userData, authToken);
-            // login(userResponse.data.user);
             console.log('verified successfully mohit');
             navigate('/artists/booking', { 
               state: { 
@@ -103,13 +100,11 @@ const handleOtpSubmit = async (e) => {
                 user: userData
               }
             });
-
-            
             console.log('verified successfully mohit2');
           }
+          
         } catch (userErr) {
-          // console.error('Login error:', userErr);
-          setError(userErr.response?.data?.error || 'Error checking user status');
+          setError(userErr.response?.data?.error || 'Phone number not found. Please sign up first.');
         }
       } else {
         setError('Invalid OTP. Please try again.');
@@ -119,7 +114,13 @@ const handleOtpSubmit = async (e) => {
     } finally {
       setLoading(false);
     }
-};
+  };
+
+  const handleSignUpClick = () => {
+    onClose();
+    onOpenSignUp();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
@@ -185,6 +186,19 @@ const handleOtpSubmit = async (e) => {
             </button>
           </form>
         )}
+
+        {/* Sign Up Option */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-600 text-sm">
+            Don't have an account?{' '}
+            <button
+              onClick={handleSignUpClick}
+              className="text-red-600 hover:text-red-700 font-medium"
+            >
+              Sign Up
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

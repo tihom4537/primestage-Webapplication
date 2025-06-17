@@ -60,13 +60,14 @@ exports.fetchArtistsInServiceRegion = async (req, res) => {
             return res.status(400).json({ error: 'No Artist found in service region' });
         }
 
-        console.log('📡 Executing database query for region:', region.name);
+        console.log('📡 Executing database queries for region:', region.name);
 
-        // Query to fetch artists with their average ratings
-        const query = `
+        // First query: fetch individual artists
+        const individualArtistsQuery = `
             SELECT 
                 a.*,
-                ROUND(AVG(r.rating), 1) as average_rating
+                ROUND(AVG(r.rating), 1) as average_rating,
+                'individual' as artist_type
             FROM 
                 artist_information a
             LEFT JOIN 
@@ -79,7 +80,7 @@ exports.fetchArtistsInServiceRegion = async (req, res) => {
                 a.id
         `;
 
-        const artists = await sequelize.query(query, {
+        const individualArtists = await sequelize.query(individualArtistsQuery, {
             replacements: {
                 skill: `%${skill}%`,
                 minLat: region.minLat,
@@ -89,9 +90,46 @@ exports.fetchArtistsInServiceRegion = async (req, res) => {
             },
             type: QueryTypes.SELECT
         });
-        console.log(artists);
 
-        console.log(`✅ Successfully fetched ${artists.length} artists`);
+        console.log(`✅ Fetched ${individualArtists.length} individual artists`);
+
+        // Second query: fetch team artists
+        const teamArtistsQuery = `
+            SELECT 
+                at.*,
+                ROUND(AVG(r.rating), 1) as average_rating,
+                'team' as artist_type
+            FROM 
+                artist_team_information at
+            LEFT JOIN 
+                reviews r ON at.id = r.team_id
+            WHERE 
+                (at.skills LIKE :skill OR at.skill_category LIKE :skill OR at.team_name LIKE :skill)
+                AND at.latitude BETWEEN :minLat AND :maxLat
+                AND at.longitude BETWEEN :minLng AND :maxLng
+            GROUP BY 
+                at.id
+        `;
+
+        const teamArtists = await sequelize.query(teamArtistsQuery, {
+            replacements: {
+                skill: `%${skill}%`,
+                minLat: region.minLat,
+                maxLat: region.maxLat,
+                minLng: region.minLng,
+                maxLng: region.maxLng
+            },
+            type: QueryTypes.SELECT
+        });
+
+        console.log(`✅ Fetched ${teamArtists.length} team artists`);
+
+        // Combine both results
+        const artists = [...individualArtists, ...teamArtists];
+
+        console.log(`✅ Successfully fetched ${artists.length} total artists (${individualArtists.length} individual + ${teamArtists.length} teams)`);
+        console.log(artists);
+        
         res.json(artists);
 
     } catch (error) {

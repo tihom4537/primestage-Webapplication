@@ -52,7 +52,7 @@ const FeaturedCategories = () => {
   const handleCategoryClick = async (category) => {
     try {
       // Similar to handleSearch in HeroSection, but using category name as the search term
-      const response = await fetch('http://localhost:8000/api/search/fetch-artists', {
+      const response = await fetch('/api/search/fetch-artists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const FeaturedCategories = () => {
       navigate('/search', { 
         state: { 
           artists: data,
-          searchTerm: category.item_name
+          searchSkill: category.item_name
         } 
       });
     } catch (err) {

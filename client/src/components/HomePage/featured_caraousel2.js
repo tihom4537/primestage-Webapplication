@@ -254,7 +254,7 @@ const FeaturedArtists2 = () => {
   // Function to handle search and navigation
   const handleSearch = async (searchTerm) => {
     try {
-      const response = await fetch('http://localhost:8000/api/search/fetch-artists', {
+      const response = await fetch('/api/search/fetch-artists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -271,7 +271,7 @@ const FeaturedArtists2 = () => {
       }
 
       const data = await response.json();
-      navigate('/search', { state: { artists: data, searchTerm } });
+      navigate('/search', { state: { artists: data, searchSkill: searchTerm } });
     } catch (err) {
       setError(err.message);
       console.error('Error fetching artists:', err);

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, Pause, Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FeaturedArtists = () => {
-  // Mock navigate function for demo
-  const navigate = (path, options) => {
-    console.log('Navigate to:', path, options);
-  };
+  // Mock navigate function for demo - replace with actual useNavigate hook
+    const navigate = useNavigate();
   
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loadedSlides, setLoadedSlides] = useState([0]); // Only preload first slide
@@ -43,8 +42,9 @@ const FeaturedArtists = () => {
         url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200",
         thumbnail: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800"
       },
-      category: "Sound Equipments",
-      specialPage: "sound-system"
+       category: "DJ"
+      // category: "Sound Equipments",
+      // specialPage: "sound-system"
     },
     {
       id: 3,
@@ -256,34 +256,52 @@ const FeaturedArtists = () => {
     resetInactivityTimer();
   };
 
-  // Function to handle search and navigation
-  const handleSearch = async (searchTerm) => {
+  // Handle click on slide content - Updated to match categories section
+  const handleSlideClick = async (artist) => {
     try {
-      // Mock API call for demo
-      const mockData = [
-        { id: 1, name: `${searchTerm} Artist 1`, category: searchTerm },
-        { id: 2, name: `${searchTerm} Artist 2`, category: searchTerm }
-      ];
+      // Special case for sound-system (slide 2)
+      if (artist.specialPage === "sound-system") {
+        // Direct navigation to sound-system page instead of API call
+        navigate('/sound-system');
+        return;
+      }
       
-      navigate('/search', { state: { artists: mockData, searchTerm } });
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching artists:', err);
-    }
-  };
+      // Make API call similar to categories section
+      const response = await fetch('/api/search/fetch-artists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          skill: artist.category, // Using category as search term
+          lat: 30.7333,
+          lng: 76.7794,
+        })
+      });
 
-  // Handle click on slide content
-  const handleSlideClick = (artist) => {
-    // Special case for sound-system (slide 2)
-    if (artist.specialPage === "sound-system") {
-      // Direct navigation to sound-system page instead of search
-      navigate('/sound-system');
-      return;
+      if (!response.ok) {
+        throw new Error('Failed to fetch artists');
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+      
+      // Navigate to search page with the fetched artists
+      navigate('/search', { 
+        state: { 
+          artists: data,
+          searchSkill: artist.category
+        } 
+      });
+    } catch (err) {
+      console.error('Error fetching artists by category:', err);
+      setError(`Error: ${err.message}`);
+      
+      // Clear error after 5 seconds
+      setTimeout(() => {
+        setError('');
+      }, 5000);
     }
-    
-    // Default behavior for other slides - search by category
-    const searchTerm = artist.category;
-    handleSearch(searchTerm);
   };
 
   return (
@@ -429,7 +447,7 @@ const FeaturedArtists = () => {
         
         {/* Error message - responsive */}
         {error && (
-          <div className="absolute bottom-0 left-0 right-0 bg-red-500 text-white py-2 px-4 text-center text-sm sm:text-base">
+          <div className="absolute bottom-0 left-0 right-0 bg-red-500 text-white py-2 px-4 text-center text-sm sm:text-base z-40">
             {error}
           </div>
         )}

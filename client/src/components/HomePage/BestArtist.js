@@ -17,7 +17,7 @@ const BestArtist = () => {
   useEffect(() => {
     const fetchArtists = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/bestArtist');
+        const response = await fetch('/api/bestArtist');
         if (!response.ok) {
           throw new Error('Failed to fetch artists');
         }

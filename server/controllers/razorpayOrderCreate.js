@@ -7,8 +7,8 @@ const { v4: uuidv4 } = require('uuid'); // You'll need to install uuid package
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_Hb4hFCm46361XC',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'your_razorpay_secret_key'
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_3E5HkheNxutxky',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'qpins0d1lLghfAc5m0TOs1NS'
 });
 
 // Create an order
@@ -51,7 +51,7 @@ router.post('/create-order', async (req, res) => {
       order_id: order.id,
       currency: order.currency,
       amount: order.amount / 100, // Convert back to main currency unit for display
-      key: process.env.RAZORPAY_KEY_ID || 'rzp_test_Hb4hFCm46361XC'
+      key: process.env.RAZORPAY_KEY_ID || 'rzp_live_3E5HkheNxutxky'
     });
   } catch (error) {
     console.error('❌ Error creating Razorpay order:', error);
@@ -71,7 +71,7 @@ router.post('/verify-payment', async (req, res) => {
     // Verify signature
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'your_razorpay_secret_key')
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'qpins0d1lLghfAc5m0TOs1NS')
       .update(sign)
       .digest('hex');
 

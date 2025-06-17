@@ -79,9 +79,12 @@ exports.getAllBookings = async (req, res) => {
             // Convert status code to a readable format
             let statusText;
             switch(booking.status) {
-                case 1:
+                case 0:
                     statusText = "initiated";
                     break;
+                case 1:
+                    statusText = "responded";
+                    break;    
                 case 2:
                     statusText = "responded";
                     break;

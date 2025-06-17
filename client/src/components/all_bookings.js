@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import StaticHeader from './HomePage/staticHeader';
 
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -130,6 +131,7 @@ const AllBookings = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <StaticHeader/>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">All Bookings</h1>
         <Link 

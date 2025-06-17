@@ -119,7 +119,7 @@ const HeroSection = ({ mainLogoStyles }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/search/fetch-artists', {
+      const response = await fetch('/api/search/fetch-artists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

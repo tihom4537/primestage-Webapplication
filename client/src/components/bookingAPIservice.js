@@ -1,7 +1,7 @@
 
 
 // Base URL configuration
-const BASE_URL = 'http://localhost:8000/api/booking';
+const BASE_URL = '/api/booking';
 
 // Default headers for requests
 const defaultHeaders = {

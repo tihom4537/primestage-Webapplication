@@ -17,7 +17,7 @@ const BestTeam = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/bestTeam');
+        const response = await fetch('/api/bestTeam');
         if (!response.ok) {
           throw new Error('Failed to fetch team members');
         }

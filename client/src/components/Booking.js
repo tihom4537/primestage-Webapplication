@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,  useRef,useEffect } from 'react';
 import { ArrowLeft, Calendar, Clock, Info, MapPin, Navigation, X, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
@@ -15,7 +15,7 @@ const BookingDetails = () => {
 const navigate = useNavigate();
   // Form state
   const [selectedDate, setSelectedDate] = useState(null);
-  const [fromTime, setFromTime] = useState('09:00');
+  const [fromTime, setFromTime] = useState();
   const [toTime, setToTime] = useState('17:00');
   const [showFromClock, setShowFromClock] = useState(false);
   const [showToClock, setShowToClock] = useState(false);
@@ -56,6 +56,9 @@ const navigate = useNavigate();
   const [bookingCreated, setBookingCreated] = useState(false);
   const [bookingError, setBookingError] = useState('');
 
+  // In your component:
+  const dateInputRef = useRef(null);
+
   // State for payment information
   const [paymentData, setPaymentData] = useState({
     payment_id: '',
@@ -67,28 +70,37 @@ const navigate = useNavigate();
 
   // Calculate total price based on artist's rate and duration
   const [totalHours, setTotalHours] = useState(0);
-  const hourlyRate = artist?.price_per_hour || 5000;
-  const soundSystemPrice = 2000;
-  const totalArtistPrice = totalHours * hourlyRate;
+ const hourlyRate = Number(artist?.price_per_hour) || 5000;
+const soundSystemPrice = Number(2000.00); 
+  const totalArtistPrice =  hourlyRate;
+  
+  console.log(totalArtistPrice);
+  console.log(soundSystemPrice );
   const totalPrice = hasSoundSystem ? totalArtistPrice + soundSystemPrice : totalArtistPrice;
+  console.log(totalPrice );
 
   const { error, isLoading, Razorpay } = useRazorpay();
   // Convert string time (HH:MM) to hours and minutes considering AM/PM
   const parseTime = (timeString, amPm) => {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    let displayHours = hours;
-    
-    // Convert 24-hour format to 12-hour for display
-    if (hours === 0) {
-      displayHours = 12; // 12 AM
-    } else if (hours > 12) {
-      displayHours = hours - 12; // PM hours
-    } else if (hours === 12) {
-      displayHours = 12; // 12 PM
-    }
-    
-    return { hours, minutes, displayHours };
-  };
+  // Add null check to prevent error
+  if (!timeString || typeof timeString !== 'string') {
+    return { hours: 0, minutes: 0, displayHours: 12 }; // Default fallback values
+  }
+  
+  const [hours, minutes] = timeString.split(':').map(Number);
+  let displayHours = hours;
+  
+  // Convert 24-hour format to 12-hour for display
+  if (hours === 0) {
+    displayHours = 12; // 12 AM
+  } else if (hours > 12) {
+    displayHours = hours - 12; // PM hours
+  } else if (hours === 12) {
+    displayHours = 12; // 12 PM
+  }
+  
+  return { hours, minutes, displayHours };
+};
 
   // Convert hours, minutes, and AM/PM to 24-hour format string
   const formatTime = (hours, minutes, amPm) => {
@@ -106,9 +118,20 @@ const navigate = useNavigate();
   
   // Format time for display in input (keeps 24-hour format for the HTML input)
   const formatDisplayTime = (timeString, amPm) => {
-    const { hours, minutes } = parseTime(timeString, amPm);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
+  // Return empty string if no time is selected
+  if (!timeString) return '';
+  
+  const parsed = parseTime(timeString, amPm);
+  
+  // Check if parseTime returned valid values
+  if (!parsed || parsed.hours === undefined || parsed.minutes === undefined) {
+    return '';
+  }
+  
+  const { hours, minutes } = parsed;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
+
 
   // Toggle AM/PM for a time
   const toggleAmPm = (isFromTime) => {
@@ -318,11 +341,7 @@ const navigate = useNavigate();
   };
 
   const categories = [
-    'Wedding',
-    'Corporate Event',
-    'Birthday Party',
-    'Festival',
-    'Concert'
+    'House party', 'Corporate event', 'Wedding events','School or College fest','Cultural or Art Exhibitions','Festival','Birthday party','Private booking','Baby showers','Private Dinners','others'
   ];
 
   const audienceSizes = [
@@ -342,10 +361,10 @@ const navigate = useNavigate();
       
       if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
         const diff = to - from;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        setDuration(`${hours} hours ${minutes} minutes`);
-        setTotalHours(hours + (minutes / 60));
+        // const hours = Math.floor(diff / (1000 * 60 * 60));
+        // const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        setDuration(`2 - 2.5 hours`);
+        // setTotalHours(hours + (minutes / 60));
       }
     }
   }, [fromTime, toTime]);
@@ -528,7 +547,7 @@ console.log(userId);
        console.log(artist.id);
     
     // Form validation
-    if (!name || !selectedDate || !fromTime || !toTime || !formattedAddress || !selectedCategory  || !audienceSize) {
+    if (!name || !selectedDate || !fromTime  || !formattedAddress || !selectedCategory  || !audienceSize) {
       setBookingError("Please fill in all required fields");
       return;
     }
@@ -547,8 +566,8 @@ console.log(userId);
       ? selectedDate 
       : new Date(selectedDate).toISOString().split('T')[0],
         booked_from: fromTime,
-        booked_to: toTime,
-        duration,
+        booked_to: "2025-06-03 13:35:33",
+        duration:"2 - 2.5 hour",
         audience_size: audienceSize,
         formattedAddress,
         special_request: message,
@@ -581,7 +600,6 @@ const handleProceedToPayment = async () => {
       name,
       date: selectedDate,
       fromTime,
-      toTime,
       duration,
       // category,
       audienceSize,
@@ -598,7 +616,7 @@ const handleProceedToPayment = async () => {
     });
     
     // First, create an order on the server
-    const response = await fetch('http://localhost:8000/api/payments/create-order', {
+    const response = await fetch('/api/payments/create-order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -634,7 +652,7 @@ const handleProceedToPayment = async () => {
           
           // Verify the payment on the server
           try {
-            const verifyResponse = await fetch('http://localhost:8000/api/payments/verify-payment', {
+            const verifyResponse = await fetch('/api/payments/verify-payment', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -662,7 +680,7 @@ const handleProceedToPayment = async () => {
               try {
                 console.log("Sending notification to artist with token:", artist.fcm_token);
                 // Send notification to artist about new booking
-                const notificationResponse = await fetch('http://localhost:8000/api/notifications/send-notification-artist', {
+                const notificationResponse = await fetch('/api/notifications/send-notification-artist', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -776,7 +794,7 @@ const handleProceedToPayment = async () => {
               <h2 className="text-xl font-semibold text-gray-900">{artist?.name || artist?.team_name || "Artist Name"}</h2>
               <p className="text-lg font-normal mt-1">{artist?.skill_category || "Singer"}</p>
               <p className="text-lg font-medium mt-1">Rating: {artist?.average_rating || "4.5"}/5</p>
-              <p className="text-rose-600 text-lg font-medium mt-1">₹{artist?.price_per_hour || "5,000"} Per Hour</p>
+              <p className="text-rose-600 text-lg font-medium mt-1">₹{artist?.price_per_hour || "5,000"} Event Price</p>
               <p className="text-sm text-gray-600">(Includes all the Taxes)</p>
             </div>
           </div>
@@ -850,25 +868,38 @@ const handleProceedToPayment = async () => {
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Venue and Timings</h2>
               
-              <div className="flex items-center border border-gray-200 rounded-xl p-4 mb-4 hover:border-rose-500 transition-colors">
-                <input
-                  type="date"
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="flex-grow border-none focus:outline-none bg-transparent"
-                />
-                <Calendar className="text-gray-400" />
-              </div>
+             <div 
+  className="flex items-center border border-gray-200 rounded-xl p-4 mb-4 hover:border-rose-500 transition-colors cursor-pointer"
+  onClick={() => {
+    dateInputRef.current?.focus();
+    // For modern browsers, this forces the calendar to open
+    if (dateInputRef.current?.showPicker) {
+      dateInputRef.current.showPicker();
+    }
+  }}
+>
+  <input
+    ref={dateInputRef}
+    type="date"
+    placeholder="EVENT DATE"
+    onChange={(e) => setSelectedDate(e.target.value)}
+    className="flex-grow border-none focus:outline-none bg-transparent"
+    style={{ colorScheme: 'light' }} // Ensures consistent styling
+  />
+  <Calendar className="text-gray-400 ml-2" />
+</div>
   
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> */}
                 {/* From Time Input */}
                  <div className="relative">
           <input
-            type="time"
+            type=""
             placeholder="From"
             value={formatDisplayTime(fromTime, fromAmPm)}
             onChange={(e) => handleInputChange(e, true)}
             onClick={() => {
               setShowFromClock(true);
+              // console.log(value);
               setShowToClock(false);
             }}
             className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 focus:outline-none transition-colors"
@@ -883,7 +914,7 @@ const handleProceedToPayment = async () => {
           )}
         </div>
         
-        {/* To Time Input */}
+        {/* To Time Input
         <div className="relative">
           <input
             type="time"
@@ -904,8 +935,8 @@ const handleProceedToPayment = async () => {
           {showToClock && (
             <ClockWidget isFromTime={false} />
           )}
-        </div>
-              </div>
+        </div> */}
+              {/* </div> */}
 
               {/* Duration Display */}
               {duration && (
