@@ -499,7 +499,7 @@ const extractYoutubeId = (url) => {
           </button>
         </div>
 
-       // Phone Authentication Modal
+       
         {/* {showAuthModal && (
           <PhoneAuthModal artist={artist} onClose={() => setShowAuthModal(false)} />
         )} */}

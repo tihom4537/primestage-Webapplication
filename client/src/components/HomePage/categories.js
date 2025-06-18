@@ -13,7 +13,7 @@ const FeaturedCategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
         try {
-          const response = await fetch('http://localhost:8000/api/artists', {
+          const response = await fetch('/api/artists', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, SlidersHorizontal,Plus } from 'lucide-react';
 import StaticHeader  from '../HomePage/staticHeader';
+import Footer from '../HomePage/footer';
+import MovingBoxes from '../HomePage/testimonials';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -46,6 +48,62 @@ const SearchResults = () => {
   };
 
   const locations = ['Chandigarh', 'Mohali', 'Panchkula'];
+
+
+const [expandedFaq, setExpandedFaq] = useState(null);
+  
+     const toggleFaq = (index) => {
+       if (expandedFaq === index) {
+         setExpandedFaq(null);
+       } else {
+         setExpandedFaq(index);
+       }
+     };
+
+
+    // FAQ Data
+   const faqs = [
+    {
+                question: 'What is your refund policy?',
+                answer: 'We offer a 100% refund if the booking is cancelled at least 3 days before the event. Cancellations made less than 3 days before the event may be subject to partial or no refund as per our cancellation policy.',
+              },
+              {
+                question: 'Will I have to provide accommodation and traveling charges for an artist separately?',
+                answer: 'No, accommodation and travel charges are included in the event price. You don\'t need to pay anything extra for these arrangements.',
+              },
+              {
+                question: 'Will the artist perform on requested songs?',
+                answer: 'Yes, artists generally accept special song requests. We recommend sharing your preferred songs in advance so the artist can prepare accordingly.',
+              },
+               {
+                question: 'Who will arrange the sound system or audio equipment for my event?',
+                answer: 'PrimeStage will handle the complete sound system setup. We offer a wide range of sound and audio options to suit your event size and needs.',
+              },
+               {
+                question: 'Who will be responsible for the artist’s arrival, sound system, and overall event management to ensure my event goes well?',
+                answer: 'Your event will be assigned a dedicated event manager from PrimeStage. They will ensure the artist’s timely arrival, sound system setup, and smooth event coordination.',
+              },
+               {
+                question: 'Can the performance time be extended during the event?',
+                answer: 'Yes, performance time can be extended based on the artist\'s availability. Additional charges may apply, and extensions should be requested in advance or during the event.',
+              },
+              {
+                question: 'What if the artist does not arrive on time?',
+                answer: 'In the rare case of a delay, our event manager will coordinate and keep you updated. We ensure minimal disruption and work proactively to manage timing.',
+              },
+               {
+                question: 'What if the artist cancels the request at the last moment?',
+                answer: 'Artist cancellations are extremely rare, but if it happens, PrimeStage will arrange a suitable replacement artist of equal or better quality, at no extra cost.',
+              },
+               {
+                question: 'Where can I discuss the event details with the artists or chefs?',
+                answer: 'Once your booking is confirmed, you can discuss all event details directly with the artist or chef through our platform. Our support team is also available to assist you at every step.',
+              },
+   ];
+
+
+
+
 
   // Extract unique skills from all artists for genre filter
   const availableSkills = useMemo(() => {
@@ -324,6 +382,74 @@ const SearchResults = () => {
           </div>
         </div>
       </div>
+      <MovingBoxes/>
+
+
+      {/* FAQs Section */}
+     <div className="py-12 max-w-7xl mx-auto px-8">
+       <h2 className="text-2xl font-bold mb-4 text-center">FAQs</h2>
+       <div className="space-y-4">
+         {faqs.map((faq, index) => (
+           <div key={index} className="border rounded-2xl p-4 bg-white">
+             <button
+               onClick={() => toggleFaq(index)}
+               className="flex justify-between w-full text-left text-gray-700 font-medium">
+               <span>{faq.question}</span>
+               <Plus className="w-5 h-5" />
+             </button>
+             {expandedFaq === index && (
+               <div className="mt-2 text-gray-600">
+                 <p>{faq.answer}</p>
+               </div>
+             )}
+           </div>
+         ))}
+       </div>
+     </div>
+
+
+    {/* New Section Above Footer */}
+                <div className="bg-gray-50 py-16 px-4">
+                  <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                      The process of Booking Live DJs for the Event
+                    </h2>
+                    <h3 className="text-xl md:text-2xl font-medium text-gray-700 mb-6">
+                      How to Book a Live DJs in Chandigarh – Simple & Hassle-Free
+                    </h3>
+                    <div className="max-w-3xl mx-auto">
+                      <div className="text-gray-600 text-lg leading-relaxed space-y-6">
+                        <div className="text-center">
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">✨ Choose Your DJ</h4>
+                          <p>Browse top live DJs in Chandigarh and pick the perfect match for your event.</p>
+                        </div>
+
+
+                        <div className="text-center">
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">✨ Share Event Details</h4>
+                          <p>Enter your date, venue, and preferences — we'll handle the rest.</p>
+                        </div>
+
+
+                        <div className="text-center">
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">✨ We Handle Setup</h4>
+                          <p>Sound system? No worries — Primestage provides everything needed.</p>
+                        </div>
+
+
+                        <div className="text-center">
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">✨ Relax with Full Support</h4>
+                          <p>A dedicated event manager ensures smooth coordination. Need to cancel? We've got you covered.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+        
+                <Footer/>
+
     </div>
   );
 };
