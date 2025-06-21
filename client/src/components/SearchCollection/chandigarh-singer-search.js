@@ -130,43 +130,42 @@ const ChandigarhSingerSearchResults = () => {
  useEffect(() => {
 
 
-// Update document title and meta tags
-    document.title = "Live Singers In Chandigarh";
+document.title = "Live Singers In Chandigarh";
+  
+  // Helper function to update or create meta tags
+  const updateMetaTag = (name, content, useProperty = false) => {
+    const attribute = useProperty ? 'property' : 'name';
     
-    // Helper function to update or create meta tags
-    const updateMetaTag = (name, content, property = false) => {
-      const attribute = property ? 'property' : 'name';
-      let meta = document.querySelector(`meta[${attribute}="${name}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute(attribute, name);
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute('content', content);
-    };
+    // First, remove any existing tag with this name/property
+    const existingTag = document.querySelector(`meta[${attribute}="${name}"]`);
+    if (existingTag) {
+      existingTag.remove();
+    }
+    
+    // Create new meta tag
+    const meta = document.createElement('meta');
+    meta.setAttribute(attribute, name);
+    meta.setAttribute('content', content);
+    document.head.appendChild(meta);
+  };
 
-    // Primary Meta Tags
-    updateMetaTag('description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
-    updateMetaTag('keywords', 'live, Live Singers In Chandigarh, singer, chandigarh, booking, artist, House Party, Event');
-    updateMetaTag('author', 'PrimeStage');
-    updateMetaTag('robots', 'index, follow');
+  // Remove existing description tags that might conflict
+  const existingDescriptions = document.querySelectorAll('meta[name="description"]');
+  existingDescriptions.forEach(tag => tag.remove());
 
-     // Open Graph / Facebook
-    updateMetaTag('og:type', 'website', true);
-    updateMetaTag('og:url', 'https://primestage.in/', true);
-    updateMetaTag('og:title', 'Live Singers In Chandigarh', true);
-    updateMetaTag('og:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.', true);
-    updateMetaTag('og:image', '/og-image.jpg', true);
+  // Set new meta tags
+  updateMetaTag('description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
+  updateMetaTag('keywords', 'live, Live Singers In Chandigarh, singer, chandigarh, booking, artist, House Party, Event');
+  
+  // Update Open Graph tags
+  updateMetaTag('og:title', 'Live Singers In Chandigarh', true);
+  updateMetaTag('og:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.', true);
+  
+  // Update Twitter tags (use name, not property)
+  updateMetaTag('twitter:title', 'Live Singers In Chandigarh');
+  updateMetaTag('twitter:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
 
-
-    // Twitter Cards
-   updateMetaTag('twitter:card', 'summary_large_image', true);
-   updateMetaTag('twitter:title', 'Live Singers In Chandigarh', true);
-   updateMetaTag('twitter:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.', true);
-   updateMetaTag('twitter:image', '/og-image.jpg', true);
-
-
-
+ 
 
    const fetchArtists = async () => {
      // If no search parameters, redirect back or show error
@@ -481,10 +480,10 @@ const formatSkills = (skills) =>
              >
                <div className="relative w-full h-[250px] md:h-[375px] overflow-hidden mb-4 rounded-t-2xl">
                  <img
-                   src={artist.profile_photo || "/api/placeholder/400/300"}
+                   src={artist.profile_photo || ""}
                    alt={artist.name}
                    className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform rounded-t-2xl"
-                   onError={(e) => e.target.src = "/api/placeholder/400/300"}
+                   onError={(e) => e.target.src = ""}
                  />
                </div>
                <div className="px-4 pb-4">
@@ -579,7 +578,7 @@ const formatSkills = (skills) =>
            <p className="text-gray-600 text-lg leading-relaxed">
             Looking to book a live singer in Chandigarh? Discover handpicked, verified artists who can elevate any event with their live performances.
              From soulful wedding singers to dynamic performers for corporate events, birthday parties, and private gatherings — our platform connects you with the best live singers in Chandigarh.
-Compare prices, view profiles, and book your ideal performer with confidence. Whether it’s a small celebration or a grand affair, find the perfect live music experience tailored to your event.
+            Compare prices, view profiles, and book your ideal performer with confidence. Whether it’s a small celebration or a grand affair, find the perfect live music experience tailored to your event.
            </p>
          </div>
        </div>

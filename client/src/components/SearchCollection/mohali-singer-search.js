@@ -88,6 +88,7 @@ const MohaliSingerSearchResults = () => {
     };
 
     // Primary Meta Tags
+    
     updateMetaTag('description', 'Hire the best live singers in Mohali directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
     updateMetaTag('keywords', 'live, Live Singers In Mohali, singer, Mohali, booking, artist, House Party, Corporate Event,Events');
     updateMetaTag('author', 'PrimeStage');
