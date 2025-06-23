@@ -5,7 +5,8 @@ import StaticHeader from '../HomePage/staticHeader';
 import Footer from '../HomePage/footer';
 import MovingBoxes from '../HomePage/testimonials';
 import {  ArrowLeft, SlidersHorizontal ,Star, Share2, Heart, MapPin, User, ChevronRight, Plus, Calendar, Check, Loader2, X } from 'lucide-react';
-
+import SEOHead from './SEOPage';
+import { Helmet } from 'react-helmet';
 
 const ChandigarhSingerSearchResults = () => {
  const location = useLocation();
@@ -130,7 +131,7 @@ const ChandigarhSingerSearchResults = () => {
  useEffect(() => {
 
 
-document.title = "Live Singers In Chandigarh";
+   document.title = "Live Singers In Chandigarh";
   
   // Helper function to update or create meta tags
   const updateMetaTag = (name, content, useProperty = false) => {
@@ -156,15 +157,21 @@ document.title = "Live Singers In Chandigarh";
   // Set new meta tags
   updateMetaTag('description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
   updateMetaTag('keywords', 'live, Live Singers In Chandigarh, singer, chandigarh, booking, artist, House Party, Event');
+  updateMetaTag('author', 'PrimeStage');
+  updateMetaTag('robots', 'index, follow');
   
   // Update Open Graph tags
+  updateMetaTag('og:type', 'website', true);
+  updateMetaTag('og:url', 'https://primestage.in/live/singer', true);
   updateMetaTag('og:title', 'Live Singers In Chandigarh', true);
   updateMetaTag('og:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.', true);
+  updateMetaTag('og:image', '/og-image.jpg', true);
   
   // Update Twitter tags (use name, not property)
+  updateMetaTag('twitter:card', 'summary_large_image');
   updateMetaTag('twitter:title', 'Live Singers In Chandigarh');
   updateMetaTag('twitter:description', 'Hire the best live singer in Chandigarh directly with no middleman. PrimeStage offers top-rated singers for weddings, parties, and live events.');
-
+  updateMetaTag('twitter:image', '/og-image.jpg');
  
 
    const fetchArtists = async () => {
@@ -309,9 +316,8 @@ const formatSkills = (skills) =>
 
 
  return (
-  
-   
    <div className="min-h-screen bg-white">
+
      {/* Static Header */}
      <StaticHeader/>
       {/* Full-width Image with Centered Heading */}
@@ -587,6 +593,7 @@ const formatSkills = (skills) =>
 
      <Footer/>
    </div>
+
  
  );
 };

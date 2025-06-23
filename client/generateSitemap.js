@@ -22,7 +22,6 @@ const routes = [
   { path: '/FAQ', priority: '0.7', changefreq: 'monthly' },
   
   // Booking and services
-  { path: '/all-bookings', priority: '0.8', changefreq: 'daily' },
   { path: '/sound-system', priority: '0.8', changefreq: 'weekly' },
   { path: '/sound-booking', priority: '0.8', changefreq: 'weekly' },
   

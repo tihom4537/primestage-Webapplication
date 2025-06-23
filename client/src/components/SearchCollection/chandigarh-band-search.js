@@ -132,40 +132,47 @@ const ChandigarhBandSearchResults = () => {
 
 
 
-  // Update document title and meta tags
-    document.title = "Live Bands In Chandigarh";
+ document.title = "Live Bands In Chandigarh";
+  
+  // Helper function to update or create meta tags
+  const updateMetaTag = (name, content, useProperty = false) => {
+    const attribute = useProperty ? 'property' : 'name';
     
-    // Helper function to update or create meta tags
-    const updateMetaTag = (name, content, property = false) => {
-      const attribute = property ? 'property' : 'name';
-      let meta = document.querySelector(`meta[${attribute}="${name}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute(attribute, name);
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute('content', content);
-    };
+    // First, remove any existing tag with this name/property
+    const existingTag = document.querySelector(`meta[${attribute}="${name}"]`);
+    if (existingTag) {
+      existingTag.remove();
+    }
+    
+    // Create new meta tag
+    const meta = document.createElement('meta');
+    meta.setAttribute(attribute, name);
+    meta.setAttribute('content', content);
+    document.head.appendChild(meta);
+  };
 
-    // Primary Meta Tags
-    updateMetaTag('description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.');
-    updateMetaTag('keywords', 'live,Live Bands in Chandigarh, Live Singers In Chandigarh, band, chandigarh, booking, artist, House Party, Event');
-    updateMetaTag('author', 'PrimeStage');
-    updateMetaTag('robots', 'index, follow');
+  // Remove existing description tags that might conflict
+  const existingDescriptions = document.querySelectorAll('meta[name="description"]');
+  existingDescriptions.forEach(tag => tag.remove());
 
-     // Open Graph / Facebook
-    updateMetaTag('og:type', 'website', true);
-    updateMetaTag('og:url', 'https://primestage.in/', true);
-    updateMetaTag('og:title', 'Live Bands In Chandigarh', true);
-    updateMetaTag('og:description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.', true);
-    updateMetaTag('og:image', '/og-image.jpg', true);
-
-
-    // Twitter Cards
-   updateMetaTag('twitter:card', 'summary_large_image', true);
-   updateMetaTag('twitter:title', 'Live Bands In Chandigarh', true);
-   updateMetaTag('twitter:description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.', true);
-   updateMetaTag('twitter:image', '/og-image.jpg', true);
+  // Set new meta tags
+  updateMetaTag('description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.');
+  updateMetaTag('keywords', 'live,Live Bands in Chandigarh, Live Singers In Chandigarh, band, chandigarh, booking, artist, House Party, Event');
+  updateMetaTag('author', 'PrimeStage');
+  updateMetaTag('robots', 'index, follow');
+  
+  // Update Open Graph tags
+  updateMetaTag('og:type', 'website', true);
+  updateMetaTag('og:url', 'https://primestage.in/', true);
+  updateMetaTag('og:title', 'Live Bands In Chandigarh', true);
+  updateMetaTag('og:description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.', true);
+  updateMetaTag('og:image', '/og-image.jpg', true);
+  
+  // Update Twitter tags (use name, not property)
+  updateMetaTag('twitter:card', 'summary_large_image');
+  updateMetaTag('twitter:title', 'Live Bands In Chandigarh');
+  updateMetaTag('twitter:description', 'Choose from the largest collection of bands in Chandigarh directly with no middleman. PrimeStage offers top-rated bands for weddings, parties, and live events.');
+  updateMetaTag('twitter:image', '/og-image.jpg');
 
 
    const fetchArtists = async () => {
