@@ -32,6 +32,9 @@ const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [formattedAddress, setFormattedAddress] = useState('');
 
+
+  const baseUrl = process.env.REACT_APP_BASE_URL ;
+
     const [_isLoading, setIsLoading] = useState(false);
     const [_error, setError] = useState('');
      const [isSearching, setIsSearching] = useState(false);
@@ -616,7 +619,7 @@ const handleProceedToPayment = async () => {
     });
     
     // First, create an order on the server
-    const response = await fetch('/api/payments/create-order', {
+    const response = await fetch(`${baseUrl}/api/payments/create-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -652,7 +655,7 @@ const handleProceedToPayment = async () => {
           
           // Verify the payment on the server
           try {
-            const verifyResponse = await fetch('/api/payments/verify-payment', {
+            const verifyResponse = await fetch(`${baseUrl}/api/payments/verify-payment`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -680,7 +683,7 @@ const handleProceedToPayment = async () => {
               try {
                 console.log("Sending notification to artist with token:", artist.fcm_token);
                 // Send notification to artist about new booking
-                const notificationResponse = await fetch('/api/notifications/send-notification-artist', {
+                const notificationResponse = await fetch(`${baseUrl}/api/notifications/send-notification-artist`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

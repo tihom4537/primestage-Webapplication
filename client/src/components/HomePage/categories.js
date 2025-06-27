@@ -9,11 +9,12 @@ const FeaturedCategories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const navigate = useNavigate();
+    const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   useEffect(() => {
     const fetchCategories = async () => {
         try {
-          const response = await fetch('/api/artists', {
+          const response = await fetch(`${baseUrl}/api/artists`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ const FeaturedCategories = () => {
   const handleCategoryClick = async (category) => {
     try {
       // Similar to handleSearch in HeroSection, but using category name as the search term
-      const response = await fetch('/api/search/fetch-artists', {
+      const response = await fetch(`${baseUrl}/api/search/fetch-artists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

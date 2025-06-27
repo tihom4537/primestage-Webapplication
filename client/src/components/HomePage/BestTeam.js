@@ -13,11 +13,12 @@ const BestTeam = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch('/api/bestTeam');
+        const response = await fetch(`${baseUrl}/api/bestTeam`);
         if (!response.ok) {
           throw new Error('Failed to fetch team members');
         }

@@ -12,6 +12,9 @@ const SearchResults = () => {
   const searchSkill = location.state?.searchSkill || '';
   const searchCity = location.state?.searchCity || 'Chandigarh';
 
+   const baseUrl = process.env.REACT_APP_BASE_URL ;
+  
+
   // Function to format the skill name for display
   const formatSkillForDisplay = (skill) => {
     if (!skill) return '';

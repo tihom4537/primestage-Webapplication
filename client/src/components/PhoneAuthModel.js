@@ -15,6 +15,7 @@ const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const { user } = useAuth();
+    const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   // Add effect to close modal and redirect if user is already logged in
   useEffect(() => {
@@ -30,7 +31,7 @@ const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
   }, [user, navigate, artist, onClose]);
 
   // API configuration
-  const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+  // const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
   const validatePhone = (phone) => {
     return phone.length === 10 && /^\d+$/.test(phone);
@@ -48,7 +49,7 @@ const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
     setLoading(true);
     try {
       // Call the send OTP API
-      const response = await axios.post(`${API_BASE_URL}/auth/send-otp`, {
+      const response = await axios.post(`${baseUrl}/api/auth/send-otp`, {
         numbers: phoneNumber
       });
 
@@ -76,7 +77,7 @@ const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
     setLoading(true);
     try {
       // Verify OTP
-      const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, {
+      const response = await axios.post(`${baseUrl}/api/auth/verify-otp`, {
         numbers: phoneNumber,
         otp: otp
       });
@@ -84,7 +85,7 @@ const PhoneAuthModal = ({ artist, onClose, onOpenSignUp }) => {
       if (response.data.message === 'OTP verified successfully') {
         try {
           // Make sure the property names match what the backend expects
-          const userResponse = await axios.post(`${API_BASE_URL}/login/user`, {
+          const userResponse = await axios.post(`${baseUrl}/api/login/user`, {
             phone_number: phoneNumber,
             fcm_token: 'mohit here'
           });

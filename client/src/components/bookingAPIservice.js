@@ -1,7 +1,9 @@
 
 
 // Base URL configuration
-const BASE_URL = '/api/booking';
+
+  const baseUrl = process.env.REACT_APP_BASE_URL ;
+const BASE_URL = `${baseUrl}/api/booking`;
 
 // Default headers for requests
 const defaultHeaders = {

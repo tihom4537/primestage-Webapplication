@@ -27,6 +27,7 @@ const NavigationMenu = ({ isMenuOpen, setIsMenuOpen }) => {
     "COMEDIAN",
     "DANCERS"
   ];
+const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   const supportItems = [
     { text: "Customer Support", icon: HelpCircle, path: "/contact-us" },
@@ -46,7 +47,7 @@ const NavigationMenu = ({ isMenuOpen, setIsMenuOpen }) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/search/fetch-artists', {
+      const response = await fetch(`${baseUrl}/api/search/fetch-artists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

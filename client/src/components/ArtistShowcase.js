@@ -33,6 +33,8 @@ const ArtistShowcase = () => {
  const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
 
+  const baseUrl = process.env.REACT_APP_BASE_URL ;
+
   // Sample rating data (replace with actual data)
   const ratingData = {
     averageRating: artist?.average_rating || 4.5,
@@ -92,7 +94,7 @@ const ArtistShowcase = () => {
   const fetchArtistDetails = async (artistId) => {
     setIsArtistLoading(true);
     try {
-      const response = await fetch(`/api/search/artists/${artistId}`);
+      const response = await fetch(`${baseUrl}/api/search/artists/${artistId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch artist details');
@@ -112,7 +114,7 @@ const ArtistShowcase = () => {
   const fetchTeamDetails = async (teamId) => {
     setIsArtistLoading(true);
     try {
-      const response = await fetch(`/api/search/team/${teamId}`);
+      const response = await fetch(`${baseUrl}/api/search/team/${teamId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch team member details');
@@ -545,7 +547,7 @@ const extractYoutubeId = (url) => {
         {images.map((image, index) => (
           <img
             key={index}
-            src={image || '/api/placeholder/400/400'}
+            src={image || ''}
             alt={`Image ${index + 1}`}
             className={`cursor-pointer flex-shrink-0 w-72 sm:w-80 md:w-full h-64 object-cover rounded-2xl ${
               selectedImage === index ? 'border-4 border-red-600' : ''
@@ -555,7 +557,7 @@ const extractYoutubeId = (url) => {
             }}
             onClick={() => setSelectedImage(index)}
             onError={(e) => {
-              e.target.src = '/api/placeholder/400/400';
+              e.target.src = '';
             }}
           />
         ))}
@@ -591,17 +593,17 @@ const extractYoutubeId = (url) => {
           alt="YouTube thumbnail" 
           className="w-full h-64 object-cover rounded-2xl"
           onError={(e) => {
-            e.target.src = '/api/placeholder/400/320';
+            e.target.src = '';
           }}
         />
       ) : (
         // For regular videos
         <img 
-          src={video.thumbnailUrl || '/api/placeholder/400/320'} 
+          src={video.thumbnailUrl || ''} 
           alt="Video thumbnail" 
           className="w-full h-64 object-cover rounded-2xl"
           onError={(e) => {
-            e.target.src = '/api/placeholder/400/320';
+            e.target.src = '';
           }}
         />
       )}

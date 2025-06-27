@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 // You would need to update this with your actual API URL
-const API_DOMAIN = 'http://localhost:8000/api/kits';
+
+const baseUrl = process.env.REACT_APP_BASE_URL ;
+const API_DOMAIN = `${baseUrl}/api/kits`;
 
 const CustomizeSoundSystemPage = ({ sourceScreen }) => {
   const [items, setItems] = useState([]);

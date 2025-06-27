@@ -19,7 +19,8 @@ const SignUpModal = ({ artist, onClose, onOpenLogin }) => {
   const { login } = useContext(AuthContext);
 
   // API configuration
-  const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+  // const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+      const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -60,7 +61,7 @@ const SignUpModal = ({ artist, onClose, onOpenLogin }) => {
     setLoading(true);
     try {
       // Send OTP for phone verification
-      const response = await axios.post(`${API_BASE_URL}/auth/send-otp`, {
+      const response = await axios.post(`${baseUrl}/api/auth/send-otp`, {
         numbers: formData.phoneNumber
       });
      
@@ -89,7 +90,7 @@ const SignUpModal = ({ artist, onClose, onOpenLogin }) => {
     setLoading(true);
     try {
       // Verify OTP
-      const verifyResponse = await axios.post(`${API_BASE_URL}/auth/verify-otp`, {
+      const verifyResponse = await axios.post(`${baseUrl}/api/auth/verify-otp`, {
         numbers: formData.phoneNumber,
         otp: otp
       });
@@ -100,7 +101,7 @@ const SignUpModal = ({ artist, onClose, onOpenLogin }) => {
       if (verifyResponse.data.message === 'OTP verified successfully') {
         console.log('bhdhbv jnjnfkvkj,nkvn');
         // Create user account
-        const signUpResponse = await axios.post(`${API_BASE_URL}/signup/user`, {
+        const signUpResponse = await axios.post(`${baseUrl}/api/signup/user`, {
           name: formData.name,
           email: formData.email,
           phone_number: formData.phoneNumber,

@@ -14,6 +14,8 @@ const FeaturedArtists2 = () => {
   const autoplayTimerRef = useRef(null);
   const inactivityTimerRef = useRef(null);
   const mediaCache = useRef(new Map());
+
+      const baseUrl = process.env.REACT_APP_BASE_URL ;
   
   // Track network usage for debugging (remove in production)
   const networkUsageRef = useRef({
@@ -254,7 +256,7 @@ const FeaturedArtists2 = () => {
   // Function to handle search and navigation
   const handleSearch = async (searchTerm) => {
     try {
-      const response = await fetch('/api/search/fetch-artists', {
+      const response = await fetch(`${baseUrl}/api/search/fetch-artists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

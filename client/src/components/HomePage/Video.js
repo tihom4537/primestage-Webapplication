@@ -14,6 +14,7 @@ const SearchPlaceholder = () => {
   const terms = ['SINGER', 'DANCER', 'DJ', 'BANDS'];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animationState, setAnimationState] = useState('idle');
+ 
 
   useEffect(() => {
     const animationCycle = () => {
@@ -63,6 +64,7 @@ const HeroSection = ({ mainLogoStyles }) => {
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
   const navigate = useNavigate();
+   const baseUrl = process.env.REACT_APP_BASE_URL ;
 
   // Add reload detection
   useEffect(() => {
@@ -119,7 +121,7 @@ const HeroSection = ({ mainLogoStyles }) => {
     }
 
     try {
-      const response = await fetch('/api/search/fetch-artists', {
+      const response = await fetch(`${baseUrl}/api/search/fetch-artists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

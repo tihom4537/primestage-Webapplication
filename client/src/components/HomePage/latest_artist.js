@@ -13,13 +13,15 @@ const LatestArtists = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+    const baseUrl = process.env.REACT_APP_BASE_URL ;
+  
 
   useEffect(() => {
     const fetchArtists = async () => {
       try {
         const lat = 30.75;
         const lng = 76.78;
-        const response = await fetch(`/api/search/featured?lat=${lat}&lng=${lng}`);
+        const response = await fetch(`${baseUrl}/api/search/featured?lat=${lat}&lng=${lng}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch artists');

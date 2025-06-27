@@ -13,6 +13,8 @@ const AllBookings = () => {
     try {
       setLoading(true);
       
+   const baseUrl = process.env.REACT_APP_BASE_URL ;
+      
       // Get user data from localStorage
       const userData = localStorage.getItem('user');
       
@@ -33,7 +35,7 @@ const AllBookings = () => {
       }
       
       // Use axios consistently instead of mixing fetch and axios
-      const response = await axios.post('http://localhost:8000/api/allbookings', {
+      const response = await axios.post(`${baseUrl}/api/allbookings`, {
         userId: userObject.id
       });
       
@@ -58,6 +60,7 @@ const AllBookings = () => {
   }, [fetchBookings]);
 
   const handleDeleteBooking = async (bookingId) => {
+     const baseUrl = process.env.REACT_APP_BASE_URL ;
     if (window.confirm('Are you sure you want to delete this booking?')) {
       try {
         // Get auth token from localStorage
@@ -68,7 +71,7 @@ const AllBookings = () => {
         }
         
         // Make API call to delete the booking
-        await axios.delete(`http://localhost:8000/api/bookings/${bookingId}`, {
+        await axios.delete(`${baseUrl}/api/bookings/${bookingId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

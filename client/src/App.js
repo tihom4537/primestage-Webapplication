@@ -1,8 +1,10 @@
 // Add this near the top of client/src/index.js (before any React imports)
 // Your existing React imports and render code below...
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+/* global gtag */
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import HomePage from './components/HomePage/HomePage';
-import SearchResults from './components/SearchResults/SearchResults'; // You'll need to update this path based on where you save the SearchResults component
+import SearchResults from './components/SearchResults/SearchResults'; // You'll need to update this path based on where you save the >
 import ArtistShowcase from './components/ArtistShowcase';
 import BookingDetails from './components/Booking';
 import { AuthProvider } from './context/AuthContext';
@@ -15,7 +17,6 @@ import  AllBookings from './components/all_bookings';
 import  CustomizeSoundSystemPage from './components/sound_system';
 import SoundDetails from './components/sound_booking';
 import FAQPage from './components/HomePage/fAQ';
-
 
 import ChandigarhSingerSearchResults from './components/SearchCollection/chandigarh-singer-search';
 import ChandigarhInstrumentalistSearchResults from './components/SearchCollection/chandigarh-instrumentalist-search';
@@ -37,51 +38,65 @@ window.onbeforeunload = function() {
   return "Are you sure you want to leave?";
 };
 
+// Google Analytics page tracking component
+function usePageTracking() {
+  const location = useLocation();
+useEffect(() => {
+    // Check if gtag is available (it should be loaded from index.html)
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('config', 'AW-17192608191', {
+        page_path: location.pathname + location.search,
+        page_title: document.title
+      });
+    }
+  }, [location]);
+} // Wrapper component to track page views
+function AppWithTracking() {
+  usePageTracking();
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/search" element={<SearchResults />} />
+      <Route path="/artists/:id" element={<ArtistShowcase />} />
+      <Route path="/artists/booking" element={<BookingDetails />} />
+      <Route path="/company-policies" element={<CompanyPoliciesPage />} />
+      <Route path="/search/company-policies" element={<CompanyPoliciesPage />} />
+      <Route path="/term-conditions" element={< TermAndCondition />} />
+      <Route path="/search/term-conditions" element={< TermAndCondition />} />
+      <Route path="/search/refund-policy" element={< RefundPolicy />} />
+      <Route path="/refund-policy" element={< RefundPolicy />} />
+      <Route path="/search/Shipping-delivery" element={< BookingsAndPerformancePage/>} />
+      <Route path="/contact-us" element={<ContactUsPage/>} />
+      <Route path="/all-bookings" element={<AllBookings/>} />
+      <Route path="/sound-system" element={<CustomizeSoundSystemPage/>} />
+      <Route path="/sound-booking" element={<SoundDetails/>} />
+      <Route path="/FAQ" element={<FAQPage/>} />
+
+      <Route path="/live/singer" element={<ChandigarhSingerSearchResults />} />  <Route path="/live/instrumentalist" element={<ChandigarhInstrumentalistSearchResults  />} />
+      <Route path="/live/DJ" element={<ChandigarhDJSearchResults />} />
+      <Route path="/live/band" element={<ChandigarhBandSearchResults />} />
+
+      <Route path="/live/singer/mohali" element={<MohaliSingerSearchResults />} />
+      <Route path="/live/instrumentalist/mohali" element={<MohaliInstrumentalistSearchResults/>} />
+      <Route path="/live/DJ/mohali" element={<MohaliDJSearchResults />} />
+      <Route path="/live/band/mohali" element={<MohaliBandSearchResults  />} />
+
+      <Route path="/live/singer/panchkula" element={<PanchkulaSingerSearchResults />} />
+      <Route path="/live/instrumentalist/panchkula" element={<PanchkulaInstrumentalistSearchResults/>} />
+      <Route path="/live/DJ/panchkula" element={<PanchkulaDJSearchResults />} />
+      <Route path="/live/band/panchkula" element={<PanchkulaBandSearchResults />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
-     <AuthProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/artists/:id" element={<ArtistShowcase />} />
-        <Route path="/artists/booking" element={<BookingDetails />} />
-        <Route path="/company-policies" element={<CompanyPoliciesPage />} />
-         <Route path="/search/company-policies" element={<CompanyPoliciesPage />} />
-        <Route path="/term-conditions" element={< TermAndCondition />} />
-        <Route path="/search/term-conditions" element={< TermAndCondition />} />
-        <Route path="/search/refund-policy" element={< RefundPolicy />} />
-         <Route path="/refund-policy" element={< RefundPolicy />} />
-        <Route path="/search/Shipping-delivery" element={< BookingsAndPerformancePage/>} />
-        <Route path="/contact-us" element={<ContactUsPage/>} />
-        <Route path="/all-bookings" element={<AllBookings/>} />
-        <Route path="/sound-system" element={<CustomizeSoundSystemPage/>} />
-        <Route path="/sound-booking" element={<SoundDetails/>} />
-        <Route path="/FAQ" element={<FAQPage/>} />
-       
-
-
-
-
-        <Route path="/live/singer" element={<ChandigarhSingerSearchResults />} />
-        <Route path="/live/instrumentalist" element={<ChandigarhInstrumentalistSearchResults  />} />
-        <Route path="/live/DJ" element={<ChandigarhDJSearchResults />} />
-        <Route path="/live/band" element={<ChandigarhBandSearchResults />} />
-
-        <Route path="/live/singer/mohali" element={<MohaliSingerSearchResults />} />
-        <Route path="/live/instrumentalist/mohali" element={<MohaliInstrumentalistSearchResults/>} />
-         <Route path="/live/DJ/mohali" element={<MohaliDJSearchResults />} />
-         <Route path="/live/band/mohali" element={<MohaliBandSearchResults  />} />
-
-          <Route path="/live/singer/panchkula" element={<PanchkulaSingerSearchResults />} />
-        <Route path="/live/instrumentalist/panchkula" element={<PanchkulaInstrumentalistSearchResults/>} />
-         <Route path="/live/DJ/panchkula" element={<PanchkulaDJSearchResults />} />
-         <Route path="/live/band/panchkula" element={<PanchkulaBandSearchResults />} />
-         
-      
-      </Routes>
-    </BrowserRouter>
-     </AuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppWithTracking />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
