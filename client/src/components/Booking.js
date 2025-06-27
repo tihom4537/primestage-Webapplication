@@ -1,16 +1,22 @@
 import React, { useState,  useRef,useEffect } from 'react';
-import { ArrowLeft, Calendar, Clock, Info, MapPin, Navigation, X, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Info, MapPin, Navigation, X, ChevronDown, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 import { useLocation, useNavigate  } from 'react-router-dom';
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 import apiService from './bookingAPIservice';
+import StaticHeader from './HomePage/staticHeader';
 // import { useLocation, useNavigate } from 'react-router-dom';
 
 const BookingDetails = () => {
   // Get artist and user data from navigation state
   const location = useLocation();
   const { artist, user } = location.state || {};
+
+
+
+  
+  // const { soundSystemPrice, soundSystemDetail} = location.state || {};
   
 const navigate = useNavigate();
   // Form state
@@ -31,6 +37,19 @@ const navigate = useNavigate();
   const [name, setName] = useState(user?.name || '');
   const [message, setMessage] = useState('');
   const [formattedAddress, setFormattedAddress] = useState('');
+  const [soundSystemDetails, setSoundSystemDetails] = useState(null);
+
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+const [missingFields, setMissingFields] = useState([]);
+ 
+// Initialize the state with the value from location.state if it exists
+const [soundSystemPrice, setSoundSystemPrice] = useState( 0);
+
+
+const [netAmount, setNetAmount] = useState(0);
+const [totalAmount, setTotalAmount] = useState(0);
 
 
   const baseUrl = process.env.REACT_APP_BASE_URL ;
@@ -42,6 +61,27 @@ const navigate = useNavigate();
       const [firstName, setFirstName] = useState('');
   const [userInfoUpdated, setUserInfoUpdated] = useState(false);
   const [userInfoError, setUserInfoError] = useState('');
+  const [showEquipmentDialog, setShowEquipmentDialog] = useState(false);
+
+
+
+
+
+  // Validation function
+const validateFields = () => {
+  const fields = [
+    { value: name, label: 'Name', key: 'name' },
+    { value: selectedCategory, label: 'Category', key: 'selectedCategory' },
+    { value: audienceSize, label: 'Audience Size', key: 'audienceSize' },
+    { value: selectedDate, label: 'Date', key: 'selectedDate' },
+    { value: fromTime, label: 'Time', key: 'fromTime' },
+    { value: formattedAddress, label: 'Address', key: 'formattedAddress' }
+  ];
+
+  const missing = fields.filter(field => !field.value || field.value === '');
+  return missing;
+};
+  
   // State for booking form
   const [bookingData, setBookingData] = useState({
     selectedDate: new Date(),
@@ -59,6 +99,72 @@ const navigate = useNavigate();
   const [bookingCreated, setBookingCreated] = useState(false);
   const [bookingError, setBookingError] = useState('');
 
+
+
+
+  const directAccess = () => {
+    if (location.state?.fromSoundSystem) {
+      const price = location.state.soundSystemPrice;
+      const details = location.state.soundSystemDetails;
+      
+      console.log('Direct access - Price:', price);
+      console.log('Direct access - Details:', details);
+      
+      return { price, details };
+    }
+    return { price: 0, details: null };
+  };
+
+const getSoundSystemPrice = async (selectedSize) => {
+  try {
+    const response = await fetch(`${baseUrl}/api/equip/sound-system-price`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json'
+      },
+      body: JSON.stringify({ audience_size: selectedSize })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sound system price. Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Sound system price response:', data);
+
+    // Update state with sound system details
+    setSoundSystemDetails(data);
+    
+    // Update sound system price and net amount
+    const soundSystemPriceInt = data.sound_system_price || 0;
+    setSoundSystemPrice(soundSystemPriceInt);
+    
+    // Calculate new total amount
+    const newTotalAmount = totalArtistPrice + soundSystemPriceInt;
+    setTotalAmount(newTotalAmount);
+    setNetAmount(newTotalAmount);
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching sound system price:', error);
+    throw error;
+  }
+};
+
+const handleSoundSystemToggle = () => {
+  setHasSoundSystem(!hasSoundSystem);
+  if (!hasSoundSystem && audienceSize) {
+    // If enabling sound system and audience size is selected, fetch price
+    getSoundSystemPrice(audienceSize);
+  } else {
+    // If disabling sound system, reset sound system price and total amount
+    setSoundSystemPrice(0);
+    setTotalAmount(totalArtistPrice);
+    setNetAmount(totalArtistPrice);
+  }
+};
+
   // In your component:
   const dateInputRef = useRef(null);
 
@@ -74,8 +180,9 @@ const navigate = useNavigate();
   // Calculate total price based on artist's rate and duration
   const [totalHours, setTotalHours] = useState(0);
  const hourlyRate = Number(artist?.price_per_hour) || 5000;
-const soundSystemPrice = Number(2000.00); 
+// const soundSystemPrice = Number(2000.00); 
   const totalArtistPrice =  hourlyRate;
+
   
   console.log(totalArtistPrice);
   console.log(soundSystemPrice );
@@ -358,6 +465,7 @@ const soundSystemPrice = Number(2000.00);
   ];
 
   useEffect(() => {
+    directAccess();
     if (fromTime && toTime) {
       const from = new Date(`2000/01/01 ${fromTime}`);
       const to = new Date(`2000/01/01 ${toTime}`);
@@ -372,12 +480,60 @@ const soundSystemPrice = Number(2000.00);
     }
   }, [fromTime, toTime]);
 
-  const handleSoundClick = () => {
+// In your booking page - Enhanced useEffect
+useEffect(() => {
+  console.log('------mohit is here ---------');
+  console.log('Location state:', location.state);
+  
+  let soundSystemData = null;
+  
+  // First, try to get data from navigation state
+  if (location.state?.fromSoundSystem) {
+    console.log('------Got data from navigation state--------');
+    soundSystemData = location.state;
+  } else {
+    // Fallback: try to get data from localStorage
+    const storedData = localStorage.getItem('soundSystemData');
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        // Check if data is recent (within last 5 minutes)
+        if (parsedData.timestamp && (Date.now() - parsedData.timestamp) < 300000) {
+          console.log('------Got data from localStorage--------');
+          soundSystemData = parsedData;
+          // Clear the localStorage after using it
+          localStorage.removeItem('soundSystemData');
+        }
+      } catch (error) {
+        console.error('Error parsing localStorage data:', error);
+      }
+    }
+  }
+  
+  // Process the data if available
+  if (soundSystemData) {
+    console.log('------Processing sound system data--------');
+    const { soundSystemPrice: price, soundSystemDetails: details } = soundSystemData;
+    
+    setSoundSystemPrice(price || 0);
+    setSoundSystemDetails(details || null);
+    
+    console.log('Sound System Price:', price);
+    console.log('Sound System Details:', details);
+  } else {
+    console.log('------No sound system data found--------');
+  }
+}, [location.state]);
 
-    // setShowLocationDialog(true);
-    console.log('mohit is here ');
-    console.log(artist);
-  };
+ const handleSoundClick = () => {
+  navigate('/sound-system', { 
+    state: { 
+      sourceScreen: 'bookingpage',
+      currentAudienceSize: audienceSize,
+      currentSoundSystemDetails: soundSystemDetails
+    } 
+  });
+};
 
   const handleLocationClick = () => {
     setShowLocationDialog(true);
@@ -597,6 +753,17 @@ console.log(userId);
 
 // Client-side implementation for notifications in payment flow
 const handleProceedToPayment = async () => {
+
+  const missing = validateFields();
+  
+  if (missing.length > 0) {
+    setMissingFields(missing);
+    setShowValidationDialog(true);
+    return;
+  }
+
+  setButtonLoading(true);
+
   try {
     // Create booking details object
     const bookingDetails = {
@@ -651,6 +818,7 @@ const handleProceedToPayment = async () => {
         description: `Event booking on PrimeStage`,
         order_id: orderData.order_id, // Use the order_id from the server
         handler: async function(paymentResponse) {
+          setButtonLoading(false);
           console.log("Payment successful:", paymentResponse);
           
           // Verify the payment on the server
@@ -719,6 +887,7 @@ const handleProceedToPayment = async () => {
             // Here you would typically navigate to a confirmation page
             // For example: navigate('/booking-confirmation', { state: { booking: bookingResponse } });
           } catch (error) {
+            setButtonLoading(false);
             console.error("Payment verification error:", error);
             alert(`Payment verification failed: ${error.message}`);
           }
@@ -739,14 +908,17 @@ const handleProceedToPayment = async () => {
       // Create and open Razorpay payment window
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', function(response) {
+        setButtonLoading(false);
         console.error("Payment failed:", response.error);
         alert(`Payment failed: ${response.error.description}`);
       });
       rzp.open();
     } else {
+      setButtonLoading(false);
       alert("Razorpay failed to load. Please try again later.");
     }
   } catch (error) {
+    setButtonLoading(false);
     console.error("Error in payment process:", error);
     alert(`Payment initialization failed: ${error.message}`);
   }
@@ -769,9 +941,13 @@ const handleProceedToPayment = async () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full mx-auto">
-        <CardHeader className="p-6">
+    <>
+    <StaticHeader/>
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-2 sm:px-6 lg:px-8">
+   
+     
+        <Card className="w-full max-w-7xl mx-auto">
+         <CardHeader className="p-4 sm:p-6">
           <div className="flex items-center space-x-4">
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <ArrowLeft className="w-6 h-6" />
@@ -780,7 +956,7 @@ const handleProceedToPayment = async () => {
           </div>
         </CardHeader>
   
-        <CardContent className="mx-7 p-6 space-y-8">
+         <CardContent className="mx-2 sm:mx-7 p-4 sm:p-6 space-y-6 sm:space-y-8">
           {/* Artist Info */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-16 p-6 bg-gray-50 rounded-xl sm:w-full">
             {/* Profile Image Container */}
@@ -839,18 +1015,25 @@ const handleProceedToPayment = async () => {
 
               {/* Audience Size Dropdown */}
               <div className="relative">
-                <select
-                  value={audienceSize}
-                  onChange={(e) => setAudienceSize(e.target.value)}
-                  className="w-full p-4 border border-gray-200 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 focus:outline-none transition-colors appearance-none bg-white"
-                >
-                  <option value="">Your Audience Size</option>
-                  {audienceSizes.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
+
+            <select
+            value={audienceSize}
+            onChange={(e) => {
+           const selectedSize = e.target.value;
+          setAudienceSize(selectedSize);
+          if (hasSoundSystem && selectedSize) {
+          getSoundSystemPrice(selectedSize);
+          }
+          }}
+          className="w-full p-4 border border-gray-200 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 focus:outline-none transition-colors appearance-none bg-white"
+          >
+         <option value="">Your Audience Size</option>
+         {audienceSizes.map((size) => (
+         <option key={size} value={size}>
+         {size}
+         </option>
+         ))}
+        </select>
                 {/* Dropdown Icon */}
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                   <ChevronDown className="w-5 h-5" />
@@ -987,21 +1170,102 @@ const handleProceedToPayment = async () => {
                     <span className="text-gray-600">Sound system price:</span>
                     <span className="font-medium">₹{soundSystemPrice.toLocaleString()}</span>
                   </div>
-                  <button className="flex items-center text-blue-600 hover:text-blue-700 transition-colors mr-20">
-                    <span className="mr-2">See what's included</span>
-                    <Info size={16} className="text-rose-500" />
-                  </button>
+                  {/* Update the See what's included button */}
+<button 
+  className="flex items-center text-blue-600 hover:text-blue-700 transition-colors mr-20"
+  onClick={() => setShowEquipmentDialog(true)}
+>
+  <span className="mr-2">See what's included</span>
+  <Info size={16} className="text-rose-500" />
+</button>
+
+{/* Equipment Dialog using API data */}
+{showEquipmentDialog && soundSystemDetails && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      {/* Header - Fixed */}
+      <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
+          Sound System Equipment
+        </h3>
+        <button
+          onClick={() => setShowEquipmentDialog(false)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+        >
+          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      </div>
+
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Equipment Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(soundSystemDetails.equipment || {}).map(([key, value]) => (
+              <div 
+                key={key} 
+                className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+              >
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base capitalize">
+                    {key.replace(/_/g, ' ')}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Quantity:</span> {value.quantity}
+                  </p>
+                  {value.description && (
+                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                      {value.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Price Information */}
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 sm:p-6 space-y-3">
+            <div className="text-center">
+              <p className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+                Total Sound System Price:
+              </p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-rose-600">
+                ₹{soundSystemDetails.sound_system_price?.toLocaleString() || '0'}
+              </p>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-600 text-center">
+              Note: Equipment specifications are based on your selected audience size of {audienceSize}.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer - Fixed */}
+      <div className="border-t border-gray-200 p-4 sm:p-6 flex-shrink-0">
+        <div className="flex justify-center">
+          <button
+            onClick={() => setShowEquipmentDialog(false)}
+            className="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm sm:text-base font-medium"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
                 </>
               )}
   
               <div className="flex justify-between items-center text-sm mr-20">
                 <span className="text-gray-600 italic">Have your own sound system?</span>
-                <button 
-                  onClick={() => setHasSoundSystem(!hasSoundSystem)}
-                  className={`px-3 py-1 rounded-lg ${hasSoundSystem ? 'text-red-500 hover:text-red-600' : 'text-green-500 hover:text-green-600'} transition-colors`}
-                >
-                  {hasSoundSystem ? 'Remove' : 'Add'}
-                </button>
+
+<button 
+  onClick={handleSoundSystemToggle}
+  className={`px-3 py-1 rounded-lg ${hasSoundSystem ? 'text-red-500 hover:text-red-600' : 'text-green-500 hover:text-green-600'} transition-colors`}
+>
+  {hasSoundSystem ? 'Remove' : 'Add'}
+</button>
               </div>
   
               <div className="border-t border-gray-200 pt-4 mt-4 mr-20">
@@ -1018,11 +1282,67 @@ const handleProceedToPayment = async () => {
           <button
         onClick={handleProceedToPayment}
         className="w-[70%] mx-auto bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-semibold text-lg transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 block"
-        disabled={isLoading}
+        disabled={buttonLoading}
       >
-        {isLoading ? "Loading Payment..." : "Proceed to Payment"}
+        {buttonLoading? "Loading Payment..." : "Proceed to Payment"}
       </button>
-      
+
+      {/* Validation Dialog */}
+{showValidationDialog && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center space-x-2">
+          <AlertCircle className="w-5 h-5 text-red-500" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            Missing Information
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowValidationDialog(false)}
+          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        <p className="text-gray-600 mb-4">
+          Please fill in the following required fields to proceed with payment:
+        </p>
+        
+        <div className="space-y-2">
+          {missingFields.map((field, index) => (
+            <div key={field.key} className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-sm text-gray-700 font-medium">
+                {field.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
+        <button
+          onClick={() => setShowValidationDialog(false)}
+          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => setShowValidationDialog(false)}
+          className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors font-medium"
+        >
+          Got It
+        </button>
+      </div>
+    </div>
+  </div>
+      )}
       {error && (
         <p className="text-red-500 text-center mt-2">
           Error loading payment system: {error.message}
@@ -1111,6 +1431,7 @@ const handleProceedToPayment = async () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

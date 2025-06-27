@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo  } from 'react';
 import { Star, Share2, Heart, MapPin, User, ChevronRight, Plus, Calendar, Check, Loader2, X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PhoneAuthModal from './PhoneAuthModel';

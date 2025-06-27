@@ -120,7 +120,7 @@ const AllBookings = () => {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-4">
         <p>{error}</p>
         <button 
           className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
@@ -133,154 +133,272 @@ const AllBookings = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="min-h-screen bg-gray-50">
       <StaticHeader/>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">All Bookings</h1>
-        <Link 
-          to="/bookings/new" 
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add New Booking
-        </Link>
-      </div>
-
-      {bookings.length === 0 ? (
-        <div className="text-center p-8 bg-gray-100 rounded">
-          <p className="text-gray-600">No bookings found.</p>
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Header Section - Responsive */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">All Bookings</h1>
+          {/* <Link 
+            to="/bookings/new" 
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors text-center sm:text-left"
+          >
+            Add New Booking
+          </Link> */}
         </div>
-      ) : (
-        <div className="space-y-6">
-          {bookings.map(booking => (
-            <div 
-              key={booking.id} 
-              className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow flex h-96"
-            >
-              {/* Artist Image on the left - increased width */}
-              <div className="w-80 h-full bg-gray-100 flex-shrink-0">
-                <img 
-                  src={booking.artistImage || "/default-artist-image.jpg"} 
-                  alt={`${booking.artistName || 'Artist'}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/default-artist-image.jpg";
-                  }}
-                />
-              </div>
-              
-              {/* Card Content */}
-              <div className="flex-grow p-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start mb-6">
-                    {/* Left side - Artist & Skill info */}
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-2xl">{booking.artistName || "Customer"}</h3>
+
+        {bookings.length === 0 ? (
+          <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+            <p className="text-gray-600">No bookings found.</p>
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-6">
+            {bookings.map(booking => (
+              <div 
+                key={booking.id} 
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+              >
+                {/* Mobile Layout - Vertical Stack */}
+                <div className="block md:hidden">
+                  {/* Artist Image */}
+                  <div className="w-full h-48 bg-gray-100">
+                    <img 
+                      src={booking.artistImage || "/default-artist-image.jpg"} 
+                      alt={`${booking.artistName || 'Artist'}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/default-artist-image.jpg";
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Card Content */}
+                  <div className="p-4">
+                    {/* Artist Info */}
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-xl mb-1">{booking.artistName || "Customer"}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{booking.artistSkill || "Performer"}</p>
+                      <p className="font-medium text-blue-600 text-base">{booking.eventType || "Event"}</p>
+                    </div>
+                    
+                    {/* Details Grid - Mobile */}
+                    <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                      <div>
+                        <p className="text-gray-500">Date</p>
+                        <p className="font-medium">{formatDate(booking.date)}</p>
                       </div>
-                      <p className="text-base text-gray-600">{booking.artistSkill || "Performer"}</p>
-                      <p className="mt-2 font-medium text-blue-600 text-lg">{booking.eventType || "Event"}</p>
+                      <div>
+                        <p className="text-gray-500">Time</p>
+                        <p className="font-medium">{booking.time || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Payment</p>
+                        <p className={`font-medium ${
+                          booking.paymentStatus === 'paid' ? 'text-green-600' :
+                          booking.paymentStatus === 'unpaid' ? 'text-red-600' :
+                          booking.paymentStatus === 'pending' ? 'text-yellow-600' :
+                          booking.paymentStatus === 'refunded' ? 'text-blue-600' :
+                          booking.paymentStatus === 'partial' ? 'text-orange-600' :
+                          'text-gray-600'
+                        }`}>
+                          {booking.paymentStatus || 'Unknown'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Amount</p>
+                        <p className="font-medium">₹{booking.amount ? booking.amount.toFixed(2) : '0.00'}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                      <p className="text-sm text-gray-500">Date</p>
-                      <p className="text-base font-medium">{formatDate(booking.date)}</p>
+                    
+                    {/* Address - Mobile */}
+                    <div className="mb-4">
+                      <p className="text-xs text-gray-500 mb-1">Address</p>
+                      <p className="text-sm text-gray-700 line-clamp-2">{booking.address || 'No address provided'}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Time</p>
-                      <p className="text-base font-medium">{booking.time || 'N/A'} {booking.duration ? `(${booking.duration} mins)` : ''}</p>
+                    
+                    {/* Progress Bar - Mobile */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                          Progress
+                        </span>
+                      </div>
+                      <div className="relative h-2 mb-3 text-xs flex rounded bg-gray-200">
+                        <div style={{ width: `${(getProgressSteps(booking.status) / 3) * 100}%` }} 
+                            className={`h-full rounded ${
+                              booking.status === "completed" ? "bg-green-500" : "bg-blue-500"
+                            }`}>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-600">
+                        <div className={`${getProgressSteps(booking.status) >= 1 ? "font-semibold text-blue-600" : ""}`}>
+                          Initiated
+                        </div>
+                        <div className={`${getProgressSteps(booking.status) >= 2 ? "font-semibold text-blue-600" : ""}`}>
+                          Response
+                        </div>
+                        <div className={`${getProgressSteps(booking.status) >= 3 ? "font-semibold text-green-600" : ""}`}>
+                          Completed
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Payment</p>
-                      <p className={`text-base font-medium ${
-                        booking.paymentStatus === 'paid' ? 'text-green-600' :
-                        booking.paymentStatus === 'unpaid' ? 'text-red-600' :
-                        booking.paymentStatus === 'pending' ? 'text-yellow-600' :
-                        booking.paymentStatus === 'refunded' ? 'text-blue-600' :
-                        booking.paymentStatus === 'partial' ? 'text-orange-600' :
-                        'text-gray-600'
-                      }`}>
-                        {booking.paymentStatus || 'Unknown'}
-                      </p>
+                    
+                    {/* Action Buttons - Mobile */}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      {/* <Link 
+                        to={`/bookings/${booking.id}`}
+                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded text-center transition-colors"
+                      >
+                        View Details
+                      </Link> */}
+                      {/* <div className="flex gap-2">
+                        <Link 
+                          to={`/bookings/${booking.id}/edit`}
+                          className="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white text-sm py-2 px-4 rounded text-center transition-colors"
+                        >
+                          Edit
+                        </Link>
+                        <button 
+                          onClick={() => handleDeleteBooking(booking.id)}
+                          className="flex-1 bg-red-500 hover:bg-red-700 text-white text-sm py-2 px-4 rounded transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div> */}
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Amount</p>
-                      <p className="text-base font-medium">${booking.amount ? booking.amount.toFixed(2) : '0.00'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <p className="text-sm text-gray-500">Address</p>
-                    <p className="text-base text-gray-700">{booking.address || 'No address provided'}</p>
                   </div>
                 </div>
-                
-                {/* Divider */}
-                <div className="border-t border-gray-200 pt-4">
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="relative pt-1">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex mb-2 items-center justify-between">
-                            <div>
-                              <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                                Progress
-                              </span>
-                            </div>
+
+                {/* Desktop Layout - Horizontal */}
+                <div className="hidden md:flex h-96">
+                  {/* Artist Image on the left */}
+                  <div className="w-80 h-full bg-gray-100 flex-shrink-0">
+                    <img 
+                      src={booking.artistImage || "/default-artist-image.jpg"} 
+                      alt={`${booking.artistName || 'Artist'}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/default-artist-image.jpg";
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Card Content */}
+                  <div className="flex-grow p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start mb-6">
+                        {/* Left side - Artist & Skill info */}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-2xl">{booking.artistName || "Customer"}</h3>
                           </div>
-                          <div className="relative h-2 mb-4 text-xs flex rounded bg-gray-200">
-                            <div style={{ width: `${(getProgressSteps(booking.status) / 3) * 100}%` }} 
-                                className={`h-full rounded ${
-                                  booking.status === "completed" ? "bg-green-500" : "bg-blue-500"
-                                }`}>
-                            </div>
-                          </div>
-                          <div className="flex justify-between text-xs text-gray-600">
-                            <div className={`${getProgressSteps(booking.status) >= 1 ? "font-semibold text-blue-600" : ""}`}>
-                              Booking Initiated
-                            </div>
-                            <div className={`${getProgressSteps(booking.status) >= 2 ? "font-semibold text-blue-600" : ""}`}>
-                              Artist Response
-                            </div>
-                            <div className={`${getProgressSteps(booking.status) >= 3 ? "font-semibold text-green-600" : ""}`}>
-                              Event Completed
+                          <p className="text-base text-gray-600">{booking.artistSkill || "Performer"}</p>
+                          <p className="mt-2 font-medium text-blue-600 text-lg">{booking.eventType || "Event"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div>
+                          <p className="text-sm text-gray-500">Date</p>
+                          <p className="text-base font-medium">{formatDate(booking.date)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Time</p>
+                          <p className="text-base font-medium">{booking.time || 'N/A'} {booking.duration ? `(${booking.duration} mins)` : ''}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Payment</p>
+                          <p className={`text-base font-medium ${
+                            booking.paymentStatus === 'paid' ? 'text-green-600' :
+                            booking.paymentStatus === 'unpaid' ? 'text-red-600' :
+                            booking.paymentStatus === 'pending' ? 'text-yellow-600' :
+                            booking.paymentStatus === 'refunded' ? 'text-blue-600' :
+                            booking.paymentStatus === 'partial' ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {booking.paymentStatus || 'Unknown'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Amount</p>
+                          <p className="text-base font-medium">₹{booking.amount ? booking.amount.toFixed(2) : '0.00'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6">
+                        <p className="text-sm text-gray-500">Address</p>
+                        <p className="text-base text-gray-700">{booking.address || 'No address provided'}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 pt-4">
+                      {/* Progress Bar */}
+                      <div className="mb-4">
+                        <div className="relative pt-1">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex mb-2 items-center justify-between">
+                                <div>
+                                  <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                    Progress
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="relative h-2 mb-4 text-xs flex rounded bg-gray-200">
+                                <div style={{ width: `${(getProgressSteps(booking.status) / 3) * 100}%` }} 
+                                    className={`h-full rounded ${
+                                      booking.status === "completed" ? "bg-green-500" : "bg-blue-500"
+                                    }`}>
+                                </div>
+                              </div>
+                              <div className="flex justify-between text-xs text-gray-600">
+                                <div className={`${getProgressSteps(booking.status) >= 1 ? "font-semibold text-blue-600" : ""}`}>
+                                  Booking Initiated
+                                </div>
+                                <div className={`${getProgressSteps(booking.status) >= 2 ? "font-semibold text-blue-600" : ""}`}>
+                                  Artist Response
+                                </div>
+                                <div className={`${getProgressSteps(booking.status) >= 3 ? "font-semibold text-green-600" : ""}`}>
+                                  Event Completed
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Card Actions */}
+                      <div className="flex justify-end space-x-2">
+                        <Link 
+                          to={`/bookings/${booking.id}`}
+                          className="bg-blue-500 hover:bg-blue-700 text-white text-sm py-1 px-4 rounded transition-colors"
+                        >
+                          View
+                        </Link>
+                        <Link 
+                          to={`/bookings/${booking.id}/edit`}
+                          className="bg-yellow-500 hover:bg-yellow-700 text-white text-sm py-1 px-4 rounded transition-colors"
+                        >
+                          Edit
+                        </Link>
+                        <button 
+                          onClick={() => handleDeleteBooking(booking.id)}
+                          className="bg-red-500 hover:bg-red-700 text-white text-sm py-1 px-4 rounded transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Card Actions */}
-                  <div className="flex justify-end space-x-2">
-                    <Link 
-                      to={`/bookings/${booking.id}`}
-                      className="bg-blue-500 hover:bg-blue-700 text-white text-sm py-1 px-4 rounded"
-                    >
-                      View
-                    </Link>
-                    <Link 
-                      to={`/bookings/${booking.id}/edit`}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white text-sm py-1 px-4 rounded"
-                    >
-                      Edit
-                    </Link>
-                    <button 
-                      onClick={() => handleDeleteBooking(booking.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white text-sm py-1 px-4 rounded"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // You would need to update this with your actual API URL
 
 const baseUrl = process.env.REACT_APP_BASE_URL ;
 const API_DOMAIN = `${baseUrl}/api/kits`;
 
-const CustomizeSoundSystemPage = ({ sourceScreen }) => {
+const CustomizeSoundSystemPage = () => {
   const [items, setItems] = useState([]);
   const [plans, setPlans] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -15,9 +15,124 @@ const CustomizeSoundSystemPage = ({ sourceScreen }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+
+   const location = useLocation();
+    const { 
+    sourceScreen, 
+    currentAudienceSize, 
+    currentSoundSystemDetails,
+    totalArtistPrice, // Get from navigation state
+    setSoundSystemPrice, // This should be handled differently
+    setSoundSystemDetails, // This should be handled differently
+    setTotalAmount, // This should be handled differently
+    setNetAmount // This should be handled differently
+  } = location.state || {};
+
+  // Local state
+  
+
+
   useEffect(() => {
     fetchEquipmentsAndKits();
-  }, []);
+
+    // If there are current selections, initialize them
+    if (currentSoundSystemDetails) {
+      const currentEquipment = currentSoundSystemDetails.equipment;
+      
+      // Initialize selected items from current equipment
+      const initialSelectedItems = items.map(item => {
+        const currentItem = currentEquipment[item.name];
+        if (currentItem) {
+          return {
+            ...item,
+            quantity: currentItem.quantity
+          };
+        }
+        return item;
+      });
+      
+      setItems(initialSelectedItems);
+      setSelectedItems(initialSelectedItems.filter(item => item.quantity > 0));
+    }
+  }, [currentSoundSystemDetails]);
+
+ const handleAddItems = () => {
+  // Calculate totals for selected items
+  const selectedItemsWithPrice = selectedItems.map(item => ({
+    ...item,
+    price: items.find(i => i.name === item.name)?.price || 0
+  }));
+
+  const selectedKitsWithPrice = selectedKits.map(kit => ({
+    ...kit,
+    price: plans.find(p => p.name === kit.name)?.price || 0
+  }));
+
+  // Calculate total prices
+  const itemsTotal = selectedItemsWithPrice.reduce((sum, item) => 
+    sum + (item.price * item.quantity), 0);
+  
+  const kitsTotal = selectedKitsWithPrice.reduce((sum, kit) => 
+    sum + kit.price, 0);
+  
+  const totalSoundSystemPrice = itemsTotal + kitsTotal;
+
+  // Create equipment details object
+  const soundSystemDetails = {
+    equipment: {},
+    sound_system_price: totalSoundSystemPrice
+  };
+
+  // Add selected individual items to equipment details
+  selectedItemsWithPrice.forEach(item => {
+    if (item.quantity > 0) {
+      soundSystemDetails.equipment[item.name] = {
+        quantity: item.quantity,
+        description: `Individual item - ₹${item.price} per unit`,
+        price: item.price * item.quantity
+      };
+    }
+  });
+
+  // Add items from selected kits to equipment details
+  selectedKitsWithPrice.forEach(kit => {
+    kit.includedItems?.forEach(item => {
+      const itemName = item.name;
+      if (soundSystemDetails.equipment[itemName]) {
+        soundSystemDetails.equipment[itemName].quantity += item.quantity;
+        soundSystemDetails.equipment[itemName].description += ` + Included in ${kit.name}`;
+      } else {
+        soundSystemDetails.equipment[itemName] = {
+          quantity: item.quantity,
+          description: `Included in ${kit.name} kit`,
+          price: 0
+        };
+      }
+    });
+  });
+
+  const soundSystemData = {
+    soundSystemPrice: totalSoundSystemPrice,
+    soundSystemDetails: soundSystemDetails,
+    selectedItems: selectedItemsWithPrice,
+    selectedKits: selectedKitsWithPrice,
+    fromSoundSystem: true,
+    timestamp: Date.now() // Add timestamp to ensure freshness
+  };
+
+  // Store in localStorage as backup
+  localStorage.setItem('soundSystemData', JSON.stringify(soundSystemData));
+
+  // Navigate back with state
+  navigate(-1, { 
+    state: soundSystemData
+  });
+};
+
+
+
+
+
 
   const fetchEquipmentsAndKits = async () => {
     try {
@@ -160,39 +275,39 @@ const CustomizeSoundSystemPage = ({ sourceScreen }) => {
     }
   };
 
-  const handleAddItems = () => {
-    // Check if user is signed up (you would need to implement this)
-    const isSignedUp = localStorage.getItem('user_signup') === 'true';
+  // const handleAddItems = () => {
+  //   // Check if user is signed up (you would need to implement this)
+  //   const isSignedUp = localStorage.getItem('user_signup') === 'true';
 
-    if (isSignedUp) {
-      if (sourceScreen === 'bookingpage') {
-        // Go back to previous page with selections
-        navigate(-1, { 
-          state: { 
-            selectedItems: selectedItems,
-            selectedKits: selectedKits 
-          } 
-        });
-      } else {
-        // Navigate to sound booking page
-        navigate('/sound-booking', { 
-          state: { 
-            selectedItems: selectedItems,
-            selectedKits: selectedKits 
-          } 
-        });
-      }
-    } else {
-      // Store data and navigate to phone verification
-      localStorage.setItem('soundpage', 'true');
-      navigate('/phone-verification', { 
-        state: { 
-          selectedItems: selectedItems,
-          selectedKits: selectedKits 
-        } 
-      });
-    }
-  };
+  //   if (isSignedUp) {
+  //     if (sourceScreen === 'bookingpage') {
+  //       // Go back to previous page with selections
+  //       navigate(-1, { 
+  //         state: { 
+  //           selectedItems: selectedItems,
+  //           selectedKits: selectedKits 
+  //         } 
+  //       });
+  //     } else {
+  //       // Navigate to sound booking page
+  //       navigate('/sound-booking', { 
+  //         state: { 
+  //           selectedItems: selectedItems,
+  //           selectedKits: selectedKits 
+  //         } 
+  //       });
+  //     }
+  //   } else {
+  //     // Store data and navigate to phone verification
+  //     localStorage.setItem('soundpage', 'true');
+  //     navigate('/phone-verification', { 
+  //       state: { 
+  //         selectedItems: selectedItems,
+  //         selectedKits: selectedKits 
+  //       } 
+  //     });
+  //   }
+  // };
 
   const totalQuantity = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalSelectedKits = selectedKits.length;
@@ -225,7 +340,7 @@ const CustomizeSoundSystemPage = ({ sourceScreen }) => {
       {/* Hero Banner */}
       <div 
         className="w-full h-44 md:h-56 lg:h-64 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/event-banner.jpg')" }}
+        style={{ backgroundImage: "url('/83fa6f8303937819459f41b4e3e97ac3 2.jpg')" }}
       ></div>
 
       {/* Main Content */}
