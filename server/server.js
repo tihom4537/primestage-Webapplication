@@ -21,6 +21,7 @@ const equipmentRoutes = require('./routes/Equipments');
 const notificationRoutes = require('./controllers/notificationController');
 const bookingProcess = require('./routes/bookingProcess');
 const allbooking = require('./routes/allbooking');
+const soundSystemRoutes = require('./routes/SoundEquip');
 
 const { QueryTypes } = require('sequelize');
 const app = express();
@@ -64,6 +65,8 @@ app.use(cors({
  app.use('/api/booking', bookingProcess);
  app.use('/api/payments', require('./routes/payment'));
  app.use('/api/allbookings', allbooking);
+
+  app.use('/api/equip/',  soundSystemRoutes );
 
 
 // Default Route
