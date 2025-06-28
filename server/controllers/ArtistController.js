@@ -91,6 +91,13 @@ exports.fetchArtistsInServiceRegion = async (req, res) => {
             type: QueryTypes.SELECT
         });
 
+        // Modify price_per_hour for individual artists
+    individualArtists.forEach(artist => {
+    if (artist.price_per_hour) {
+        artist.price_per_hour = Math.round(artist.price_per_hour * 1.10 * 100) / 100;
+    }
+});
+
         console.log(`✅ Fetched ${individualArtists.length} individual artists`);
 
         // Second query: fetch team artists
@@ -121,6 +128,12 @@ exports.fetchArtistsInServiceRegion = async (req, res) => {
             },
             type: QueryTypes.SELECT
         });
+// Modify price_per_hour for team artists
+teamArtists.forEach(artist => {
+    if (artist.price_per_hour) {
+        artist.price_per_hour = Math.round(artist.price_per_hour * 1.10 * 100) / 100;
+    }
+});
 
         console.log(`✅ Fetched ${teamArtists.length} team artists`);
 
@@ -249,6 +262,13 @@ exports.getFeaturedArtists = async (req, res) => {
             type: QueryTypes.SELECT
         });
 
+        // Modify price_per_hour before transformation
+    featuredArtists.forEach(artist => {
+    if (artist.price_per_hour) {
+        artist.price_per_hour = Math.round(artist.price_per_hour * 1.10 * 100) / 100;
+    }
+});
+
         console.log(`✅ Successfully fetched ${featuredArtists.length} featured artists`);
 
         // Transform null average_ratings to null (in case they come as 0)
@@ -317,6 +337,10 @@ exports.fetchArtistById = async (req, res) => {
         }
 
         const artist = artists[0];
+      
+     if (artist.price_per_hour) {
+    artist.price_per_hour = Math.round(artist.price_per_hour * 1.10 * 100) / 100;
+}
         console.log('✅ Successfully fetched artist details');
         res.json(artist);
 
@@ -375,6 +399,9 @@ exports.fetchTeamById = async (req, res) => {
         }
 
         const artist = artists[0];
+       if (artist.price_per_hour) {
+    artist.price_per_hour = Math.round(artist.price_per_hour * 1.10 * 100) / 100;
+}
         console.log('✅ Successfully fetched team details');
         res.json(artist);
 
